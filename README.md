@@ -73,5 +73,6 @@ npm i @tiptap/extension-superscript@beta
 npm install @tiptap/extension-mathematics@beta katex
 npm install @tiptap/extension-code-block-lowlight@beta
 npm i @tiptap/extension-drag-handle-react
+npm install @tiptap/extension-list@3.0.0-beta.21
 
 ##

@@ -123,56 +123,31 @@
 }
 
 /* Tiptap styles */
-@layer base {
-   .tiptap {
-      ul[data-type='taskList'] {
-         @apply list-none ml-0 p-0;
-         li {
-            @apply flex items-center;
-            / > label {
-               @apply flex items-center flex-none mr-2 select-none;
-            }
-            > div {
-               @apply flex-1;
-            }
-         }
-         li > label > input[type='checkbox'] {
-            top: 0;
+.tiptap {
+   .editor-image {
+      @apply max-w-full h-auto rounded-md;
+   }
 
-            @apply appearance-none bg-background m-0 cursor-pointer w-[1.2em] h-[1.2em] relative top-0 border-2 border-border grid place-content-center;
-         }
-         li > label > span {
-         }
+   .youtube-embed {
+      @apply w-full aspect-video rounded-md;
+   }
+   .katex {
+      @apply my-2;
+   }
+   /* ✅ Image wrapper styling */
+   .image-wrapper {
+      @apply relative mb-4;
 
-         ul[data-type='taskList'] {
-            @apply m-0;
-         }
-      }
-      .editor-image {
-         @apply max-w-full h-auto rounded-md;
+      &.image-left {
+         @apply text-left;
       }
 
-      .youtube-embed {
-         @apply w-full aspect-video rounded-md;
+      &.image-center {
+         @apply text-center;
       }
-      .katex {
-         @apply my-2;
-      }
-      /* ✅ Image wrapper styling */
-      .image-wrapper {
-         @apply relative mb-4;
 
-         &.image-left {
-            @apply text-left;
-         }
-
-         &.image-center {
-            @apply text-center;
-         }
-
-         &.image-right {
-            @apply text-right;
-         }
+      &.image-right {
+         @apply text-right;
       }
    }
 }
@@ -311,16 +286,91 @@
    }
 }
 
-
-/* Basic editor styles */
 .tiptap {
-  :first-child {
-    margin-top: 0;
-  }
+   :first-child {
+      margin-top: 0;
+   }
 
-  blockquote {
-    border-left: 3px solid var(--gray-3);
-    margin: 1.5rem 0;
-    padding-left: 1rem;
-  }
+   /* blockquote styles */
+   blockquote {
+      @apply border-l-4 border-gray-300 pl-4 my-4 italic text-gray-700;
+      font-style: italic;
+      color: var(--muted-foreground);
+      background-color: var(--muted);
+      padding: 1rem;
+      border-radius: 0.5rem;
+   }
+
+   /* ✅ Liste işaretlerini görünür yapan CSS */
+   ul {
+      list-style-type: disc; /* Madde işareti */
+      padding-left: 2rem;
+      margin: 1rem 0;
+   }
+
+   ol {
+      list-style-type: decimal; /* Numaralar */
+      padding-left: 2rem;
+      margin: 1rem 0;
+   }
+   ul li,
+   ol li {
+      display: list-item; /* Liste öğesi olarak göster */
+      margin: 0.25rem 0;
+   }
+
+   /* İç içe listeler için */
+   ul ul {
+      list-style-type: circle;
+   }
+
+   ul ul ul {
+      list-style-type: square;
+   }
+   ol ol {
+      list-style-type: lower-alpha;
+   }
+
+   /* List styles */
+   ul,
+   ol {
+      padding: 0 1rem;
+      margin: 1.25rem 1rem 1.25rem 0.4rem;
+   }
+
+   ul li p,
+   ol li p {
+      margin-top: 0.25em;
+      margin-bottom: 0.25em;
+   }
+
+   /* Task list specific styles */
+   ul[data-type='taskList'] {
+      list-style: none;
+      margin-left: 0;
+      padding: 0;
+   }
+
+   ul[data-type='taskList'] li {
+      align-items: flex-start;
+      display: flex;
+   }
+
+   ul[data-type='taskList'] li > label {
+      flex: 0 0 auto;
+      margin-right: 0.5rem;
+      user-select: none;
+   }
+
+   ul[data-type='taskList'] li > div {
+      flex: 1 1 auto;
+   }
+
+   ul[data-type='taskList'] input[type='checkbox'] {
+      cursor: pointer;
+   }
+
+   ul[data-type='taskList'] ul[data-type='taskList'] {
+      margin: 0;
+   }
 }

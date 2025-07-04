@@ -7,6 +7,7 @@ import Mathematics from '@tiptap/extension-mathematics';
 import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight';
 import { common, createLowlight } from 'lowlight';
 import { CharacterCount } from '@tiptap/extensions';
+import { TaskItem, TaskList } from '@tiptap/extension-list';
 
 // ✅ Lowlight instance oluştur
 const lowlight = createLowlight(common);
@@ -14,7 +15,6 @@ const lowlight = createLowlight(common);
 export const defaultExtensions = [
    // ✅ Base Editor Extensions
    StarterKit.configure({
-      // StarterKit içindeki bazı extension'ları customize edebilirsin
       heading: {
          levels: [1, 2, 3, 4, 5, 6],
       },
@@ -43,6 +43,10 @@ export const defaultExtensions = [
       },
       codeBlock: false, // CodeBlockLowlight ile kullanacağız
       link: false,
+   }),
+   TaskList,
+   TaskItem.configure({
+      nested: true,
    }),
    CharacterCount.configure(),
    Youtube.configure({
