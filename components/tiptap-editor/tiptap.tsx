@@ -91,10 +91,10 @@ const Tiptap: React.FC<Props> = ({
          editorProps: {
             attributes: {
                class: cn(
-                  'tiptap prose prose-sm prose-slate dark:prose-invert focus:outline-none',
+                  'tiptap prose prose-sm  focus:outline-none',
                   'p-4  w-full md:min-w-[600px]',
                   'relative min-h-[300px]  border-muted bg-background',
-                  editable ? ' border-2 border-dashed hover:border-primary p-6 pt-10' : ' border-0',
+                  editable ? ' border-2 border hover:border-primary p-6 pt-10' : ' border-0',
                   className
                ),
             },

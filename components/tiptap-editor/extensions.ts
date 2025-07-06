@@ -8,6 +8,10 @@ import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight';
 import { common, createLowlight } from 'lowlight';
 import { CharacterCount } from '@tiptap/extensions';
 import { TaskItem, TaskList } from '@tiptap/extension-list';
+import TextAlign from '@tiptap/extension-text-align';
+import Highlight from '@tiptap/extension-highlight';
+import { TextStyle, Color, FontFamily, FontSize, LineHeight } from '@tiptap/extension-text-style';
+import Typography from '@tiptap/extension-typography';
 
 // ✅ Lowlight instance oluştur
 const lowlight = createLowlight(common);
@@ -44,6 +48,15 @@ export const defaultExtensions = [
       codeBlock: false, // CodeBlockLowlight ile kullanacağız
       link: false,
    }),
+   TextStyle,
+   Color,
+   FontFamily,
+   FontSize,
+   Typography,
+   LineHeight,
+   TextAlign.configure({
+      types: ['heading', 'paragraph'],
+   }),
    TaskList,
    TaskItem.configure({
       nested: true,
@@ -75,4 +88,6 @@ export const defaultExtensions = [
          class: 'code-block bg-gray-100 dark:bg-gray-800 rounded-md p-4 font-mono text-sm',
       },
    }),
-];
+   Highlight.configure({ multicolor: true }),
+  
+].filter(Boolean); // Filter out any falsy values

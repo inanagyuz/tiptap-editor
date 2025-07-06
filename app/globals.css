@@ -77,6 +77,17 @@
    --sidebar-ring: oklch(0.705 0.015 286.067);
    --background: oklch(1 0 0);
    --foreground: oklch(0.141 0.005 285.823);
+
+   /* ✅ Highlight color değişkenleri ekleyin */
+   --highlight-default: #ffffff;
+   --highlight-purple: #f6f3f8;
+   --highlight-red: #fdebeb;
+   --highlight-yellow: #fbf4a2;
+   --highlight-blue: #c1ecf9;
+   --highlight-green: #acf79f;
+   --highlight-orange: #faebdd;
+   --highlight-pink: #faf1f5;
+   --highlight-gray: #f1f1ef;
 }
 
 .dark {
@@ -111,6 +122,17 @@
    --sidebar-accent-foreground: oklch(0.985 0 0);
    --sidebar-border: oklch(1 0 0 / 10%);
    --sidebar-ring: oklch(0.552 0.016 285.938);
+
+   /* ✅ Dark mode highlight renkleri */
+   --highlight-default: #000000;
+   --highlight-purple: #3f2c4b;
+   --highlight-red: #5c1a1a;
+   --highlight-yellow: #5c4b1a;
+   --highlight-blue: #1a3d5c;
+   --highlight-green: #1a5c20;
+   --highlight-orange: #5c3a1a;
+   --highlight-pink: #5c1a3a;
+   --highlight-gray: #3a3a3a;
 }
 
 @layer base {
@@ -373,4 +395,33 @@
    ul[data-type='taskList'] ul[data-type='taskList'] {
       margin: 0;
    }
+}
+
+/* ✅ TailwindCSS ile heading stilleri */
+.tiptap h1 {
+   @apply text-4xl font-bold leading-tight mt-6 mb-4 first:mt-0;
+}
+
+.tiptap h2 {
+   @apply text-3xl font-bold leading-tight mt-5 mb-3 first:mt-0;
+}
+
+.tiptap h3 {
+   @apply text-2xl font-semibold leading-snug mt-4 mb-3 first:mt-0;
+}
+
+.tiptap h4 {
+   @apply text-xl font-semibold leading-snug mt-4 mb-2 first:mt-0;
+}
+
+.tiptap h5 {
+   @apply text-lg font-semibold leading-normal mt-3 mb-2 first:mt-0;
+}
+
+.tiptap h6 {
+   @apply text-base font-semibold leading-normal mt-3 mb-2 first:mt-0;
+}
+
+.tiptap p {
+   @apply text-base leading-relaxed mb-4;
 }

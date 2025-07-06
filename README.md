@@ -1,4 +1,4 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Tiptap Editor
 
 ## Getting Started
 
@@ -24,8 +24,9 @@ This project uses [`next/font`](https://nextjs.org/docs/app/building-your-applic
 
 To learn more about Next.js, take a look at the following resources:
 
--  [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
--  [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API
+
+## [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial
 
 You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
@@ -45,6 +46,7 @@ npx shadcn@latest add button
 npx shadcn@latest add dropdown-menu
 npx shadcn@latest add form
 npx shadcn@latest add input
+npx shadcn@latest add separator
 
 ## Ohter
 
@@ -67,12 +69,15 @@ npm install @tiptap/starter-kit@beta
 npm install @tiptap/extension-youtube
 npm install @tiptap/extension-mathematics@beta katex
 npm i @tiptap/extension-superscript@beta
-npm install @tiptap/extension-code-block-lowlight@beta
 npm install @tiptap/extension-subscript@beta
 npm i @tiptap/extension-superscript@beta
 npm install @tiptap/extension-mathematics@beta katex
 npm install @tiptap/extension-code-block-lowlight@beta
 npm i @tiptap/extension-drag-handle-react
 npm install @tiptap/extension-list@3.0.0-beta.21
-
-##
+npm install @tiptap/extension-text-align
+npm install @tiptap/extension-highlight@3.0.0-beta.21
+npm install @tiptap/extension-code-block-lowlight@3.0.0-beta.21
+npm install @tiptap/extension-text-style@3.0.0-beta.21
+npm install @tiptap/extension-typography@3.0.0-beta.21
+npm install @tiptap/extensions@3.0.0-beta.21
