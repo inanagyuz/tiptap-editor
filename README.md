@@ -47,6 +47,10 @@ npx shadcn@latest add dropdown-menu
 npx shadcn@latest add form
 npx shadcn@latest add input
 npx shadcn@latest add separator
+npx shadcn@latest add dialog
+npx shadcn@latest add drawer
+npx shadcn@latest add alert-dialog
+npx shadcn@latest add switch
 
 ## Ohter
 
@@ -81,3 +85,5 @@ npm install @tiptap/extension-code-block-lowlight@3.0.0-beta.21
 npm install @tiptap/extension-text-style@3.0.0-beta.21
 npm install @tiptap/extension-typography@3.0.0-beta.21
 npm install @tiptap/extensions@3.0.0-beta.21
+npm install @tiptap/extension-link@3.0.0-beta.21
+npm i @tiptap/extension-image@3.0.0-beta.21

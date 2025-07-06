@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
+import { cn } from '../tiptap-utils';
 import { Editor, useEditorState } from '@tiptap/react';
 import { Undo, Redo } from 'lucide-react';
 
@@ -7,12 +7,21 @@ export const UndoRedoSelector = ({ editor }: { editor: Editor }) => {
    const editorState = useEditorState({
       editor,
       selector: (ctx) => {
+         // Editör view'ı kontrol et
+         if (!ctx.editor?.view) {
+            return {
+               canUndo: false,
+               canRedo: false,
+            };
+         }
+
          return {
-            canUndo: ctx.editor.can().chain().focus().undo().run(),
-            canRedo: ctx.editor.can().chain().focus().redo().run(),
+            canUndo: ctx.editor.can().undo(),
+            canRedo: ctx.editor.can().redo(),
          };
       },
    });
+
    if (!editor) return null;
 
    return (

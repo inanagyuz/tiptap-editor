@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { EditorContent, useEditor, JSONContent, Editor } from '@tiptap/react';
 import { defaultExtensions } from './extensions';
-import { cn } from './cn';
+import { cn } from './tiptap-utils';
 import { BubbleMenuSelector, FooMenuSelector } from './';
 import { useDebouncedCallback } from 'use-debounce';
 import hljs from 'highlight.js';
