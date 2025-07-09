@@ -35,7 +35,7 @@ import { Switch } from '@/components/ui/switch';
 import { Clipboard, Loader } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { imageGallerySchema, ImageGallerySchema } from '@/schemas/imageGallery';
+import { imageGallerySchema, ImageGallerySchema } from '@/schemas/image-gallery';
 import { toast } from 'sonner';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
@@ -49,7 +49,10 @@ interface MutationParams {
 }
 
 async function mutationFn({ data, metod, id }: MutationParams) {
-   const url = `/api/admin/imageGallery`;
+   const url = process.env.NEXT_PUBLIC_IMAGE_UPLOAD_API;
+   if (!url) {
+      throw new Error('NO_IMAGE_GALLERY_URL');
+   }
 
    const response = await fetch(url, {
       method: metod,

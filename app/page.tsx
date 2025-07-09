@@ -4,7 +4,6 @@ import { ModeToggle } from '@/components/modeToggle';
 import { Tiptap } from '@/components/tiptap-editor';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, useForm } from 'react-hook-form';
-import { toast } from 'sonner';
 import * as z from 'zod/v4';
 import { Button } from '@/components/ui/button';
 import {
@@ -16,6 +15,7 @@ import {
    FormLabel,
    FormMessage,
 } from '@/components/ui/form';
+import React from 'react';
 
 const FormSchema = z.object({
    content: z.any().refine(
@@ -40,8 +40,11 @@ const FormSchema = z.object({
       }
    ),
 });
+
 const content = null;
+
 export default function Home() {
+   const [jsonData, setJsonData] = React.useState<string | null>(null);
    const form = useForm<z.infer<typeof FormSchema>>({
       resolver: zodResolver(FormSchema),
       defaultValues: {
@@ -49,13 +52,7 @@ export default function Home() {
       },
    });
    function onSubmit(data: z.infer<typeof FormSchema>) {
-      toast('You submitted the following values', {
-         description: (
-            <pre className="mt-2 w-[320px] rounded-md bg-neutral-950 p-4">
-               <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-            </pre>
-         ),
-      });
+      setJsonData(JSON.stringify(data.content, null, 2));
    }
 
    return (
@@ -108,6 +105,14 @@ export default function Home() {
                   </Button>
                </form>
             </Form>
+            {jsonData && (
+               <div className="w-full max-w-4xl">
+                  <h2 className="text-xl font-semibold mb-4">Submitted JSON Content</h2>
+                  <pre className="bg-neutral-950 p-4 rounded-md overflow-x-auto">
+                     <code className="text-white">{jsonData}</code>
+                  </pre>
+               </div>
+            )}
          </main>
          <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
             <a

@@ -18,12 +18,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useState } from 'react';
 import { AlbumArtwork } from '../image-upload/album-artwork';
-import { ImageGallerySchema } from '@/schemas/imageGallery';
+import { ImageGallerySchema } from '@/schemas/image-gallery';
 import { cn } from '../tiptap-utils';
-import { createRoot } from 'react-dom/client';
-import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query';
-import { ImageGalleryDialog } from '../image-upload/image-gallery-dialog';
-import { ImageUrl } from '../image-upload/image-url-dialog';
+
+import { useQuery } from '@tanstack/react-query';
 
 interface ImageSelectorProps {
    editor: Editor;
@@ -53,7 +51,7 @@ export const ImageSelector = ({
    const { data: galleryData, isLoading: isGalleryLoading } = useQuery({
       queryKey: ['imageGallery'],
       queryFn: async () => {
-         const galleryUrl = process.env.NEXT_PUBLIC_IMAGE_GALLERY_URL;
+         const galleryUrl = process.env.NEXT_PUBLIC_IMAGE_UPLOAD_API;
          if (!galleryUrl) {
             throw new Error('NO_IMAGE_GALLERY_URL');
          }
@@ -66,6 +64,7 @@ export const ImageSelector = ({
          return data;
       },
       enabled: imageGalleryOpen, // Gallery açıkken query'i çalıştır
+      retry: 1, // Hata durumunda 1 kez daha dene
    });
 
    const imageGallery = galleryData as ImageGallerySchema[] | [];
@@ -242,8 +241,8 @@ export const ImageSelector = ({
             <DialogContent className="sm:max-w-[700px]">
                <DialogHeader>
                   <DialogTitle>{'SELECT_IMAGE_FROM_GALLERY'}</DialogTitle>
+                  <DialogDescription>{'SELECT_IMAGE_FROM_GALLERY_DESCRIPTION'}</DialogDescription>
                </DialogHeader>
-
                <div className="py-4 max-h-[480px] overflow-y-auto">
                   {isGalleryLoading ? (
                      <div className="flex items-center justify-center h-40">
@@ -295,85 +294,4 @@ export const ImageSelector = ({
          </Dialog>
       </>
    );
-};
-
-// Image Gallery Command Function
-export const imageGalleryCommand = ({ editor }: { editor: Editor }) => {
-   // Create a container for the dialog
-   const container = document.createElement('div');
-   document.body.appendChild(container);
-
-   // Create a QueryClient for the dialog
-   const queryClient = new QueryClient();
-
-   // Create root and cleanup function
-   const root = createRoot(container);
-
-   const cleanup = () => {
-      try {
-         root.unmount();
-         if (document.body.contains(container)) {
-            document.body.removeChild(container);
-         }
-      } catch (error) {
-         console.error('Cleanup error:', error);
-      }
-   };
-
-   // Create the dialog component
-   const DialogComponent = () => {
-      const [open, setOpen] = React.useState(true);
-
-      const handleClose = () => {
-         setOpen(false);
-         // Clean up the container after dialog closes
-         setTimeout(cleanup, 100);
-      };
-
-      return (
-         <QueryClientProvider client={queryClient}>
-            <ImageGalleryDialog open={open} onOpenChange={handleClose} editor={editor} />
-         </QueryClientProvider>
-      );
-   };
-
-   // Render the dialog
-   root.render(<DialogComponent />);
-};
-
-// Image URL Command Function
-export const imageUrlCommand = ({ editor }: { editor: Editor }) => {
-   // Create a container for the dialog
-   const container = document.createElement('div');
-   document.body.appendChild(container);
-
-   // Create root and cleanup function
-   const root = createRoot(container);
-
-   const cleanup = () => {
-      try {
-         root.unmount();
-         if (document.body.contains(container)) {
-            document.body.removeChild(container);
-         }
-      } catch (error) {
-         console.error('Cleanup error:', error);
-      }
-   };
-
-   // Create the dialog component
-   const DialogComponent = () => {
-      const [open, setOpen] = React.useState(true);
-
-      const handleClose = () => {
-         setOpen(false);
-         // Clean up the container after dialog closes
-         setTimeout(cleanup, 100);
-      };
-
-      return <ImageUrl open={open} onOpenChange={handleClose} editor={editor} />;
-   };
-
-   // Render the dialog
-   root.render(<DialogComponent />);
 };

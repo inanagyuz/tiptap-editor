@@ -51,6 +51,8 @@ npx shadcn@latest add dialog
 npx shadcn@latest add drawer
 npx shadcn@latest add alert-dialog
 npx shadcn@latest add switch
+npx shadcn@latest add scroll-area
+npx shadcn@latest add command
 
 ## Ohter
 
@@ -64,26 +66,28 @@ npm i lucide-react
 npm install lowlight
 npm i highlight.js
 npm i use-debounce --save
+npm i react-markdown
+npm install ai @ai-sdk/react @ai-sdk/openai
+npm i ts-pattern
 
 ## Tiptap
 
-npm install @tiptap/react@beta
-npm install @tiptap/pm@beta
-npm install @tiptap/starter-kit@beta
-npm install @tiptap/extension-youtube
-npm install @tiptap/extension-mathematics@beta katex
-npm i @tiptap/extension-superscript@beta
-npm install @tiptap/extension-subscript@beta
-npm i @tiptap/extension-superscript@beta
-npm install @tiptap/extension-mathematics@beta katex
-npm install @tiptap/extension-code-block-lowlight@beta
-npm i @tiptap/extension-drag-handle-react
-npm install @tiptap/extension-list@3.0.0-beta.21
-npm install @tiptap/extension-text-align
-npm install @tiptap/extension-highlight@3.0.0-beta.21
-npm install @tiptap/extension-code-block-lowlight@3.0.0-beta.21
-npm install @tiptap/extension-text-style@3.0.0-beta.21
-npm install @tiptap/extension-typography@3.0.0-beta.21
-npm install @tiptap/extensions@3.0.0-beta.21
-npm install @tiptap/extension-link@3.0.0-beta.21
+npm i @tiptap/react@3.0.0-beta.21
+npm i @tiptap/pm@beta@3.0.0-beta.21
+npm i @tiptap/starter-kit@3.0.0-beta.21
+npm i @tiptap/extension-youtube@3.0.0-beta.21
+npm i @tiptap/extension-superscript@3.0.0-beta.21
+npm i @tiptap/extension-subscript@3.0.0-beta.21
+npm i @tiptap/extension-superscript@3.0.0-beta.21
+npm i @tiptap/extension-mathematics@3.0.0-beta.21 katex
+npm i @tiptap/extension-code-block-lowlight@3.0.0-beta.21
+npm i @tiptap/extension-drag-handle-react@3.0.0-beta.21
+npm i @tiptap/extension-list@3.0.0-beta.21
+npm i @tiptap/extension-text-align@3.0.0-beta.21
+npm i @tiptap/extension-highlight@3.0.0-beta.21
+npm i @tiptap/extension-code-block-lowlight@3.0.0-beta.21
+npm i @tiptap/extension-text-style@3.0.0-beta.21
+npm i @tiptap/extension-typography@3.0.0-beta.21
+npm i @tiptap/extensions@3.0.0-beta.21
+npm i @tiptap/extension-link@3.0.0-beta.21
 npm i @tiptap/extension-image@3.0.0-beta.21

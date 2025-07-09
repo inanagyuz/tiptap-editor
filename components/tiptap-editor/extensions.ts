@@ -14,12 +14,35 @@ import { TextStyle, Color, FontFamily, FontSize, LineHeight } from '@tiptap/exte
 import Typography from '@tiptap/extension-typography';
 import Link from '@tiptap/extension-link';
 import { Image } from '@tiptap/extension-image';
-import { ImageUploadNode } from './image-upload/image-upload-extension';
+import { ImageUpload } from './image-upload/image-upload-extension';
 import { MAX_FILE_SIZE, handleImageUpload } from './tiptap-utils';
 // ✅ Lowlight instance oluştur
 const lowlight = createLowlight(common);
 
+// ✅ AI Highlight Extension'ı oluştur
+const AIHighlight = Highlight.extend({
+   name: 'aiHighlight',
+
+   addCommands() {
+      return {
+         setAIHighlight:
+            () =>
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            ({ commands }: { commands: any }) => {
+               return commands.setHighlight({ color: '#7c3aed' }); // Purple highlight
+            },
+         unsetAIHighlight:
+            () =>
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            ({ commands }: { commands: any }) => {
+               return commands.unsetHighlight();
+            },
+      };
+   },
+});
+
 export const defaultExtensions = [
+   AIHighlight,
    // ✅ Base Editor Extensions
    StarterKit.configure({
       heading: {
@@ -211,7 +234,7 @@ export const defaultExtensions = [
          class: 'editor-image',
       },
    }),
-   ImageUploadNode.configure({
+   ImageUpload.configure({
       accept: 'image/*',
       maxSize: MAX_FILE_SIZE,
       limit: 3,

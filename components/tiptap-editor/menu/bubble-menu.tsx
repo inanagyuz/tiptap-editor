@@ -1,3 +1,4 @@
+import * as React from 'react';
 import { BubbleMenu } from '@tiptap/react/menus';
 import { type Editor } from '@tiptap/react';
 import { Separator } from '@/components/ui/separator';
@@ -14,9 +15,23 @@ import {
    LinkSelector,
    ImageSelector,
 } from '../selector';
+import { ContextAI } from '../extensions/context-ai';
+import { Button } from '@/components/ui/button';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Brain } from 'lucide-react';
 
 export const BubbleMenuSelector = ({ editor }: { editor: Editor }) => {
    const selectors = useSelectors();
+   const [openContextAI, setOpenContextAI] = React.useState(false);
+   const handleContextAIOpenChange = React.useCallback((open: boolean) => {
+      setOpenContextAI(open);
+   }, []);
+
+   const handleContextAIButtonClick = React.useCallback((e: React.MouseEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      setOpenContextAI(true);
+   }, []);
 
    return (
       <BubbleMenu
@@ -65,6 +80,37 @@ export const BubbleMenuSelector = ({ editor }: { editor: Editor }) => {
                <FontFamilySelector editor={editor} {...selectors.fontFamily} />
                <Separator orientation="vertical" />
                <ImageSelector editor={editor} {...selectors.image} />
+            </div>
+            {/* ✅ ContextAI Button - Sağ tarafta */}
+            <div className="flex items-center border-l border-muted">
+               <Popover open={openContextAI} onOpenChange={handleContextAIOpenChange} modal={true}>
+                  <PopoverTrigger asChild>
+                     <Button
+                        className="gap-1 rounded-none text-purple-600 hover:text-purple-700 hover:bg-purple-50"
+                        variant="ghost"
+                        size="sm"
+                        onClick={handleContextAIButtonClick}
+                     >
+                        <Brain className="h-4 w-4" />
+                        ContextAI
+                     </Button>
+                  </PopoverTrigger>
+                  <PopoverContent
+                     side="bottom"
+                     align="end"
+                     className="p-0 w-auto"
+                     onInteractOutside={(e) => {
+                        // ContextAI içindeki tıklamaları engelle
+                        if (e.target instanceof Element && e.target.closest('[data-context-ai]')) {
+                           e.preventDefault();
+                        }
+                     }}
+                  >
+                     <div data-context-ai>
+                        <ContextAI editor={editor} onOpenChange={handleContextAIOpenChange} />
+                     </div>
+                  </PopoverContent>
+               </Popover>
             </div>
          </div>
       </BubbleMenu>

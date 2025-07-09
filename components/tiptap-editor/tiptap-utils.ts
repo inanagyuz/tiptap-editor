@@ -139,9 +139,12 @@ export const handleImageUpload = async (
       onProgress?.({ progress });
    }
 
-   const urlApi = `${process.env.NEXT_PUBLIC_IMAGE_UPLOAD_URL}` || '';
+   const uploadApi = process.env.NEXT_PUBLIC_IMAGE_UPLOAD_API;
+   if (!uploadApi) {
+      throw new Error('Image upload API endpoint is not configured.');
+   }
 
-   const response = await fetch(urlApi, {
+   const response = await fetch(uploadApi, {
       method: 'POST',
       body: file as Blob,
       headers: {

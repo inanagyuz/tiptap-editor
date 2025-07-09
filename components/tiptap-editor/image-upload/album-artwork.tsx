@@ -1,7 +1,7 @@
 import React from 'react';
 import Image from 'next/image';
 import { Ban, Edit, Trash } from 'lucide-react';
-import { ImageGallerySchema } from '@/schemas/imageGallery';
+import { ImageGallerySchema } from '@/schemas/image-gallery';
 import { cn } from '@/lib/utils';
 import { FormPage } from './form';
 import { Button } from '@/components/ui/button';
