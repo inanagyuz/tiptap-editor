@@ -1,10 +1,35 @@
 'use client';
 
+/**
+ * @module ImageUploadNode
+ *
+ * This module provides the ImageUploadNode React component for TipTap editor.
+ * It enables uploading images directly within the editor, with drag-and-drop, file picker, progress display, and error handling.
+ * All UI strings are localized via i18n for multi-language support.
+ *
+ * @remarks
+ * - Supports file size and count limits, custom upload logic, and progress callbacks.
+ * - Displays upload progress, success, and error states.
+ * - Allows removing files before upload is complete.
+ * - Shows formatted file size and localized messages.
+ * - Integrates with TipTap node view system.
+ *
+ * @example
+ * ```tsx
+ * <ImageUploadNode {...props} />
+ * ```
+ *
+ * @property fileItem - The current file being uploaded.
+ * @property uploadFiles - Function to upload selected files.
+ * @property clearFileItem - Function to clear the current file item.
+ */
+
 import * as React from 'react';
 import type { NodeViewProps } from '@tiptap/react';
 import { NodeViewWrapper } from '@tiptap/react';
 import { CloseIcon, CloudUploadIcon, FileIcon, FileCornerIcon } from '../icon';
 import './image-upload.scss';
+import { i18n } from '../i18n';
 
 export interface FileItem {
    id: string;
@@ -28,13 +53,21 @@ interface UploadOptions {
    onError?: (error: Error) => void;
 }
 
+/**
+ * Custom hook for handling file upload logic and state.
+ *
+ * @param options - Upload options including limits and callbacks.
+ * @returns File upload state and functions.
+ */
+
 function useFileUpload(options: UploadOptions) {
    const [fileItem, setFileItem] = React.useState<FileItem | null>(null);
 
    const uploadFile = async (file: File): Promise<string | null> => {
       if (file.size > options.maxSize) {
+         const maxSizeMB = options.maxSize / 1024 / 1024;
          const error = new Error(
-            `File size exceeds maximum allowed (${options.maxSize / 1024 / 1024}MB)`
+            i18n.t('FILE_SIZE_EXCEEDS').replace('{maxSizeMB}', maxSizeMB.toString())
          );
          options.onError?.(error);
          return null;
@@ -54,7 +87,7 @@ function useFileUpload(options: UploadOptions) {
 
       try {
          if (!options.upload) {
-            throw new Error('Upload function is not defined');
+            throw new Error(i18n.t('UPLOAD_FUNCTION_NOT_DEFINED'));
          }
 
          const url = await options.upload(
@@ -71,7 +104,7 @@ function useFileUpload(options: UploadOptions) {
             abortController.signal
          );
 
-         if (!url) throw new Error('Upload failed: No URL returned');
+         if (!url) throw new Error(i18n.t('UPLOAD_FAILED_NO_URL'));
 
          if (!abortController.signal.aborted) {
             setFileItem((prev) => {
@@ -98,7 +131,7 @@ function useFileUpload(options: UploadOptions) {
                   progress: 0,
                };
             });
-            options.onError?.(error instanceof Error ? error : new Error('Upload failed'));
+            options.onError?.(error instanceof Error ? error : new Error(i18n.t('UPLOAD_FAILED')));
          }
          return null;
       }
@@ -106,20 +139,20 @@ function useFileUpload(options: UploadOptions) {
 
    const uploadFiles = async (files: File[]): Promise<string | null> => {
       if (!files || files.length === 0) {
-         options.onError?.(new Error('No files to upload'));
+         options.onError?.(new Error(i18n.t('NO_FILES_TO_UPLOAD')));
          return null;
       }
 
       if (options.limit && files.length > options.limit) {
          options.onError?.(
-            new Error(`Maximum ${options.limit} file${options.limit === 1 ? '' : 's'} allowed`)
+            new Error(i18n.t('MAXIMUM_FILES_ALLOWED').replace('{limit}', options.limit.toString()))
          );
          return null;
       }
 
       const file = files[0];
       if (!file) {
-         options.onError?.(new Error('File is undefined'));
+         options.onError?.(new Error(i18n.t('NO_FILE_SELECTED')));
          return null;
       }
 
@@ -186,12 +219,28 @@ const ImageUploadDragArea: React.FC<ImageUploadDragAreaProps> = ({ onFile, child
    );
 };
 
+/**
+ * Drag-and-drop area for uploading images.
+ *
+ * @param onFile - Callback for dropped files.
+ * @param children - Content to render inside the drop area.
+ */
+
 interface ImageUploadPreviewProps {
    file: File;
    progress: number;
    status: 'uploading' | 'success' | 'error';
    onRemove: () => void;
 }
+
+/**
+ * Preview component for showing file upload progress and info.
+ *
+ * @param file - The file being uploaded.
+ * @param progress - Upload progress percentage.
+ * @param status - Upload status.
+ * @param onRemove - Callback to remove the file.
+ */
 
 const ImageUploadPreview: React.FC<ImageUploadPreviewProps> = ({
    file,
@@ -242,6 +291,12 @@ const ImageUploadPreview: React.FC<ImageUploadPreviewProps> = ({
    );
 };
 
+/**
+ * Drop zone content for image upload, including icons and instructions.
+ *
+ * @param maxSize - Maximum file size in bytes.
+ */
+
 const DropZoneContent: React.FC<{ maxSize: number }> = ({ maxSize }) => (
    <>
       <div className="tiptap-image-upload-dropzone">
@@ -254,14 +309,20 @@ const DropZoneContent: React.FC<{ maxSize: number }> = ({ maxSize }) => (
 
       <div className="tiptap-image-upload-content">
          <span className="tiptap-image-upload-text">
-            <em>Click to upload</em> or drag and drop
+            <em>{i18n.t('CLICK_TO_UPLOAD')}</em> {i18n.t('OR_DRAG_AND_DROP')}
          </span>
          <span className="tiptap-image-upload-subtext">
-            Maximum file size {maxSize / 1024 / 1024}MB.
+            {i18n.t('MAXIMUM_FILE_SIZE').replace('{maxSizeMB}', (maxSize / 1024 / 1024).toString())}
          </span>
       </div>
    </>
 );
+
+/**
+ * ImageUploadNode component for TipTap editor node view.
+ *
+ * @param props - NodeViewProps from TipTap.
+ */
 
 export const ImageUploadNode: React.FC<NodeViewProps> = (props) => {
    const { accept, limit, maxSize } = props.node.attrs;
@@ -282,7 +343,7 @@ export const ImageUploadNode: React.FC<NodeViewProps> = (props) => {
    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       const files = e.target.files;
       if (!files || files.length === 0) {
-         extension.options.onError?.(new Error('No file selected'));
+         extension.options.onError?.(new Error(i18n.t('NO_FILE_SELECTED')));
          return;
       }
       handleUpload(Array.from(files));
@@ -308,9 +369,7 @@ export const ImageUploadNode: React.FC<NodeViewProps> = (props) => {
                ])
                .run();
          } else {
-            extension.options.onError?.(
-               new Error('Could not determine position for image upload.')
-            );
+            extension.options.onError?.(new Error(i18n.t('COULD_NOT_DETERMINE_POSITION')));
          }
       }
    };

@@ -1,3 +1,25 @@
+/**
+ * @module Selector
+ *
+ * This module provides the Selector React component for choosing formatting options in the Tiptap editor.
+ * It displays a list of formatting actions such as bold, italic, underline, lists, code, block quote, and clear formatting.
+ * All UI strings should be localized via i18n for multi-language support.
+ *
+ * @remarks
+ * - Integrates with Tiptap editor's formatting commands.
+ * - Highlights the active formatting option.
+ * - Supports clearing all block and inline formatting.
+ * - Shows keyboard shortcuts and descriptions for each option.
+ *
+ * @example
+ * ```tsx
+ * <Selector editor={editor} open={open} onOpenChange={setOpen} />
+ * ```
+ *
+ * @property editor - The Tiptap editor instance.
+ * @property open - Whether the selector popover is open.
+ * @property onOpenChange - Callback fired when the selector is opened or closed.
+ */
 import {
    List,
    ListOrdered,
@@ -21,7 +43,6 @@ const listItems: SelectorItem[] = [
    {
       name: 'TEXT',
       icon: Text,
-      description: 'Normal text',
       command: (editor) => editor?.chain().focus().clearNodes().run(),
       isActive: (editor) => {
          if (!editor) return false;
@@ -73,7 +94,6 @@ const listItems: SelectorItem[] = [
       command: (editor) => editor.chain().focus().toggleBlockquote().run(),
       isActive: (editor) => editor.isActive('blockquote'),
       icon: TextQuote,
-      description: 'Insert a block quote',
       shortcut: 'Ctrl+Shift+Q',
    },
    {
@@ -88,7 +108,6 @@ const listItems: SelectorItem[] = [
       command: (editor) => editor.chain().focus().setCodeBlock().run(),
       isActive: (editor) => editor.isActive('codeBlock'),
       icon: Code,
-      description: 'Insert inline code block',
       shortcut: 'Ctrl+Shift+C',
    },
    {
@@ -108,21 +127,18 @@ const listItems: SelectorItem[] = [
    {
       name: 'BULLET_LIST',
       icon: List,
-      description: 'Unordered list with bullet points',
       command: (editor) => editor?.chain().focus().toggleBulletList().run(),
       isActive: (editor) => editor?.isActive('bulletList') ?? false,
    },
    {
       name: 'NUMBERED_LIST',
       icon: ListOrdered,
-      description: 'Ordered list with numbers',
       command: (editor) => editor?.chain().focus().toggleOrderedList().run(),
       isActive: (editor) => editor?.isActive('orderedList') ?? false,
    },
    {
       name: 'TASK_LIST',
       icon: CheckSquare,
-      description: 'Interactive task list with checkboxes',
       command: (editor) => editor?.chain().focus().toggleTaskList().run(),
       isActive: (editor) => editor?.isActive('taskList') ?? false,
    },
@@ -131,7 +147,6 @@ const listItems: SelectorItem[] = [
       command: (editor) => editor.chain().focus().setHorizontalRule().run(),
       isActive: (editor) => editor.isActive('horizontalRule'),
       icon: Minus,
-      description: 'Insert a horizontal rule',
       shortcut: 'Ctrl+Shift+H',
    },
    {
@@ -172,7 +187,6 @@ const listItems: SelectorItem[] = [
       },
       icon: Trash2,
       shortcut: 'Ctrl+Shift+X',
-      description: 'Clear all formatting',
    },
 ];
 
@@ -181,6 +195,14 @@ interface SelectorProps {
    open: boolean;
    onOpenChange: (open: boolean) => void;
 }
+
+/**
+ * Selector component for choosing formatting options in the editor.
+ *
+ * @param editor - The Tiptap editor instance.
+ * @param open - Whether the selector popover is open.
+ * @param onOpenChange - Callback fired when the selector is opened or closed.
+ */
 
 export const Selector = ({ editor, open, onOpenChange }: SelectorProps) => {
    return (
@@ -191,6 +213,7 @@ export const Selector = ({ editor, open, onOpenChange }: SelectorProps) => {
          items={listItems}
          showText={false}
          showDescription={true}
+         width="w-56"
       />
    );
 };

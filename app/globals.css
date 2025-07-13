@@ -425,3 +425,7 @@
 .tiptap p {
    @apply text-base leading-relaxed mb-4;
 }
+
+.tiptap p[data-placeholder]  {
+   @apply text-xs;
+}

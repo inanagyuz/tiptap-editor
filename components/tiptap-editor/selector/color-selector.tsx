@@ -1,10 +1,35 @@
 'use client';
 
+/**
+ * @module ColorSelector
+ *
+ * This module provides the ColorSelector React component for selecting text and highlight colors in the Tiptap editor.
+ * It displays color options with preview, allows quick clearing, and supports both text and background highlight colors.
+ * All UI strings should be localized via i18n for multi-language support.
+ *
+ * @remarks
+ * - Integrates with Tiptap editor's setColor and setHighlight commands.
+ * - Highlights the active color option.
+ * - Supports quick clear actions for text and highlight colors.
+ * - Uses BaseSelector for alternative rendering and optimization.
+ *
+ * @example
+ * ```tsx
+ * <ColorSelector editor={editor} open={open} onOpenChange={setOpen} />
+ * <ColorSelectorWithBase editor={editor} open={open} onOpenChange={setOpen} />
+ * ```
+ *
+ * @property editor - The Tiptap editor instance.
+ * @property open - Whether the selector popover is open.
+ * @property onOpenChange - Callback fired when the selector is opened or closed.
+ */
+
 import { ChevronDown, Palette, Trash, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Editor } from '@tiptap/react';
 import { BaseSelector, type SelectorItem } from './base-selector';
+import { i18n } from '../i18n';
 
 export interface BubbleColorMenuItem {
    name: string;
@@ -94,6 +119,14 @@ interface ColorSelectorProps {
    open: boolean;
    onOpenChange: (open: boolean) => void;
 }
+
+/**
+ * ColorSelector component for selecting text and highlight colors in the editor.
+ *
+ * @param editor - The Tiptap editor instance.
+ * @param open - Whether the selector popover is open.
+ * @param onOpenChange - Callback fired when the selector is opened or closed.
+ */
 
 export const ColorSelector = ({ editor, open, onOpenChange }: ColorSelectorProps) => {
    if (!editor) return null;
@@ -187,7 +220,7 @@ export const ColorSelector = ({ editor, open, onOpenChange }: ColorSelectorProps
                               >
                                  A
                               </div>
-                              <span>{colorName}</span>
+                              <span>{i18n.t(colorName)}</span>
                            </div>
                            {isActive && <span className="text-blue-600 text-xs">●</span>}
                         </button>
@@ -220,7 +253,7 @@ export const ColorSelector = ({ editor, open, onOpenChange }: ColorSelectorProps
                               >
                                  A
                               </div>
-                              <span>{colorName}</span>
+                              <span>{i18n.t(colorName)}</span>
                            </div>
                            {isActive && <span className="text-blue-600 text-xs">●</span>}
                         </button>
@@ -261,7 +294,13 @@ export const ColorSelector = ({ editor, open, onOpenChange }: ColorSelectorProps
    );
 };
 
-// ✅ Alternative: BaseSelector kullanarak daha basit versiyon
+/**
+ * ColorSelectorWithBase component for selecting colors using BaseSelector.
+ *
+ * @param editor - The Tiptap editor instance.
+ * @param open - Whether the selector popover is open.
+ * @param onOpenChange - Callback fired when the selector is opened or closed.
+ */
 export const ColorSelectorWithBase = ({ editor, open, onOpenChange }: ColorSelectorProps) => {
    if (!editor) return null;
 

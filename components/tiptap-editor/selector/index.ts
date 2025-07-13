@@ -9,4 +9,13 @@ export { UndoRedoSelector } from './undo-redo-selector';
 export { BaseSelector } from './base-selector';
 export { useSelectors } from './useSelectors';
 export { LinkSelector } from './link-selector';
-export { ImageSelector } from './image-selector';
+export {
+   ImageSelector,
+   imageCommand,
+   imageGalleryCommand,
+   imageUrlCommand,
+} from './image-selector';
+export { TwitterSelector, twitterCommand } from './twitter-selector';
+export { YoutubeSelector, youtubeCommand } from './youtube-selector';
+export { importCommand, exportCommand } from './import-export-selector';
+export { ImportExportSelector } from './import-export-selector';

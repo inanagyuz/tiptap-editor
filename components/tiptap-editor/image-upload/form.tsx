@@ -1,4 +1,29 @@
 'use client';
+/**
+ * @module ImageGalleryForm
+ *
+ * This module provides form components for editing and deleting image gallery items in the Tiptap editor.
+ * It includes mutation logic for API requests, multi-language support via i18n, and mobile-friendly UI with Drawer and AlertDialog.
+ *
+ * @remarks
+ * - Supports create, update, and delete operations for image gallery items.
+ * - Uses react-hook-form and zod for validation.
+ * - Displays loading, success, and error messages with toast notifications.
+ * - All UI strings are localized via i18n for multi-language support.
+ * - Clipboard integration for copying file and path values.
+ *
+ * @example
+ * ```tsx
+ * <FormPage data={item} metod="PUT" open={open} onClose={handleClose} />
+ * <FormPage data={item} metod="DELETE" open={open} onClose={handleClose} />
+ * ```
+ *
+ * @property data - The image gallery item to edit or delete.
+ * @property metod - The operation method ('POST', 'PUT', or 'DELETE').
+ * @property open - Whether the form dialog is open.
+ * @property onClose - Callback fired when the dialog is closed.
+ */
+
 import * as React from 'react';
 import { Button } from '@/components/ui/button';
 import {
@@ -39,6 +64,7 @@ import { imageGallerySchema, ImageGallerySchema } from '@/schemas/image-gallery'
 import { toast } from 'sonner';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { i18n } from '../i18n';
 
 type Method = 'POST' | 'PUT' | 'DELETE';
 
@@ -48,10 +74,16 @@ interface MutationParams {
    id?: string;
 }
 
+/**
+ * Mutation function for image gallery API requests.
+ *
+ * @param params - Mutation parameters including data, method, and id.
+ * @returns API response data.
+ */
 async function mutationFn({ data, metod, id }: MutationParams) {
    const url = process.env.NEXT_PUBLIC_IMAGE_UPLOAD_API;
    if (!url) {
-      throw new Error('NO_IMAGE_GALLERY_URL');
+      throw new Error(i18n.t('NO_IMAGE_GALLERY_URL'));
    }
 
    const response = await fetch(url, {
@@ -71,6 +103,11 @@ async function mutationFn({ data, metod, id }: MutationParams) {
    throw error;
 }
 
+/**
+ * Custom hook for image gallery mutations.
+ *
+ * @returns Mutation object for use in forms.
+ */
 export function useFormMutation() {
    const queryClient = useQueryClient();
 
@@ -83,6 +120,9 @@ export function useFormMutation() {
    });
 }
 
+/**
+ * Default values for image gallery form.
+ */
 export const defaultValues: Partial<ImageGallerySchema> = {
    id: '',
    name: '',
@@ -102,12 +142,19 @@ interface DeleteFormProps {
    open?: boolean;
 }
 
+/**
+ * DeleteForm component for confirming and deleting an image gallery item.
+ *
+ * @param data - The image gallery item to delete.
+ * @param onClose - Callback fired when the dialog is closed.
+ * @param open - Whether the dialog is open.
+ */
 function DeleteForm({ data, onClose, open }: DeleteFormProps) {
    const { mutateAsync, isPending } = useFormMutation();
 
    const handleDelete = async () => {
       if (!data?.id) return;
-      const loadingToast = toast.loading('DELETING');
+      const loadingToast = toast.loading(i18n.t('DELETING'));
 
       try {
          await mutateAsync({
@@ -115,11 +162,11 @@ function DeleteForm({ data, onClose, open }: DeleteFormProps) {
             metod: 'DELETE',
             id: data.id,
          });
-         toast.success('DELETE_SUCCESS');
+         toast.success(i18n.t('DELETE_SUCCESS'));
          onClose?.();
          // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
-         return toast.error(error?.message || 'DELETE_ERROR');
+         return toast.error(error?.message || i18n.t('DELETE_ERROR'));
       } finally {
          toast.dismiss(loadingToast);
       }
@@ -129,19 +176,19 @@ function DeleteForm({ data, onClose, open }: DeleteFormProps) {
       <AlertDialog open={open} onOpenChange={(val) => !val && onClose?.()}>
          <AlertDialogContent>
             <AlertDialogHeader>
-               <AlertDialogTitle>{'CONFIRM_DELETE_TITLE'}</AlertDialogTitle>
-               <AlertDialogDescription>{'CONFIRM_DELETE_DESC'}</AlertDialogDescription>
+               <AlertDialogTitle>{i18n.t('CONFIRM_DELETE_TITLE')}</AlertDialogTitle>
+               <AlertDialogDescription>{i18n.t('CONFIRM_DELETE_DESC')}</AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-               <AlertDialogCancel>{'CANCEL'}</AlertDialogCancel>
+               <AlertDialogCancel>{i18n.t('CONFIRM')}</AlertDialogCancel>
                <AlertDialogAction onClick={handleDelete} disabled={isPending}>
                   {isPending ? (
                      <>
-                        {'DELETING'}
+                        {i18n.t('DELETING')}
                         <Loader className="ml-2 h-4 w-4 animate-spin" />
                      </>
                   ) : (
-                     'CONFIRM'
+                     i18n.t('CONFIRM')
                   )}
                </AlertDialogAction>
             </AlertDialogFooter>
@@ -149,6 +196,15 @@ function DeleteForm({ data, onClose, open }: DeleteFormProps) {
       </AlertDialog>
    );
 }
+
+/**
+ * EditForm component for editing or creating an image gallery item.
+ *
+ * @param data - The image gallery item to edit.
+ * @param metod - The operation method ('POST' or 'PUT').
+ * @param onClose - Callback fired when the dialog is closed.
+ * @param open - Whether the dialog is open.
+ */
 
 interface EditFormProps {
    data?: ImageGallerySchema;
@@ -184,7 +240,7 @@ function EditForm({ data, metod = 'POST', onClose, open }: EditFormProps) {
             },
             {
                onSuccess: () => {
-                  toast.success(metod === 'POST' ? 'SAVED' : 'UPDATED');
+                  toast.success(metod === 'POST' ? i18n.t('SAVING') : i18n.t('UPDATING'));
                   if (metod === 'POST') {
                      form.reset();
                   }
@@ -193,7 +249,7 @@ function EditForm({ data, metod = 'POST', onClose, open }: EditFormProps) {
                   }
                },
                onError: (error: Error) => {
-                  return toast.error(error?.message || 'ERROR');
+                  return toast.error(error?.message || i18n.t('ERROR'));
                },
             }
          );
@@ -213,9 +269,9 @@ function EditForm({ data, metod = 'POST', onClose, open }: EditFormProps) {
       >
          <DrawerContent className="md:min-w-[640px] flex items-center justify-center">
             <DrawerHeader className="gap-1 w-full">
-               <DrawerTitle>{metod === 'POST' ? 'ADD_CATEGORY' : 'EDIT_CATEGORY'}</DrawerTitle>
+               <DrawerTitle>{metod === 'POST' ? i18n.t('EDIT') : i18n.t('EDIT')}</DrawerTitle>
                <DrawerDescription>
-                  {metod === 'POST' ? 'ADD_CATEGORY' : 'EDIT_CATEGORY'}
+                  {metod === 'POST' ? i18n.t('EDIT') : i18n.t('EDIT')}
                </DrawerDescription>
             </DrawerHeader>
             <div className="flex flex-col gap-4 overflow-y-auto px-4 text-sm w-full">
@@ -227,10 +283,10 @@ function EditForm({ data, metod = 'POST', onClose, open }: EditFormProps) {
                            name="name"
                            render={({ field }) => (
                               <FormItem>
-                                 <FormLabel>{'NAME'}</FormLabel>
+                                 <FormLabel>{i18n.t('NAME')}</FormLabel>
                                  <FormControl>
                                     <Input
-                                       placeholder={'NAME'}
+                                       placeholder={i18n.t('NAME')}
                                        {...field}
                                        className="h-8 text-sm"
                                     />
@@ -244,7 +300,7 @@ function EditForm({ data, metod = 'POST', onClose, open }: EditFormProps) {
                            name="isActive"
                            render={({ field }) => (
                               <FormItem className="max-w-1/2 ">
-                                 <FormLabel>{'STATUS'}</FormLabel>
+                                 <FormLabel>{i18n.t('STATUS')}</FormLabel>
                                  <FormControl className="flex flex-row items-center justify-end rounded-md border p-2 bg-muted/50 h-8  text-sm">
                                     <div>
                                        <Switch
@@ -261,11 +317,11 @@ function EditForm({ data, metod = 'POST', onClose, open }: EditFormProps) {
                            name="type"
                            render={({ field }) => (
                               <FormItem>
-                                 <FormLabel>{'TYPE'}</FormLabel>
+                                 <FormLabel>{i18n.t('TYPE')}</FormLabel>
                                  <FormControl>
                                     <Input
                                        disabled
-                                       placeholder={'TYPE'}
+                                       placeholder={i18n.t('TYPE')}
                                        {...field}
                                        className="h-8 text-sm"
                                     />
@@ -279,18 +335,18 @@ function EditForm({ data, metod = 'POST', onClose, open }: EditFormProps) {
                            name="size"
                            render={({ field }) => (
                               <FormItem>
-                                 <FormLabel>{'SIZE'}</FormLabel>
+                                 <FormLabel>{i18n.t('SIZE')}</FormLabel>
                                  <div className="flex flex-row items-center justify-between">
                                     <FormControl>
                                        <Input
                                           disabled
-                                          placeholder={'SIZE'}
+                                          placeholder={i18n.t('SIZE')}
                                           {...field}
                                           className="h-8 text-sm flex rounded-none rounded-l-md"
                                        />
                                     </FormControl>
                                     <FormDescription className=" bg-muted/50 px-2 h-8 text-sm items-center justify-center flex rounded-r-md">
-                                       {'KB'}
+                                       {'kb'}
                                     </FormDescription>
                                  </div>
                                  <FormMessage />
@@ -302,11 +358,11 @@ function EditForm({ data, metod = 'POST', onClose, open }: EditFormProps) {
                            name="width"
                            render={({ field }) => (
                               <FormItem>
-                                 <FormLabel>{'WIDTH'}</FormLabel>
+                                 <FormLabel>{i18n.t('WIDTH')}</FormLabel>
                                  <FormControl>
                                     <Input
                                        disabled
-                                       placeholder={'WIDTH'}
+                                       placeholder={i18n.t('WIDTH')}
                                        {...field}
                                        className="h-8 text-sm"
                                     />
@@ -320,11 +376,11 @@ function EditForm({ data, metod = 'POST', onClose, open }: EditFormProps) {
                            name="height"
                            render={({ field }) => (
                               <FormItem>
-                                 <FormLabel>{'HEIGHT'}</FormLabel>
+                                 <FormLabel>{i18n.t('HEIGHT')}</FormLabel>
                                  <FormControl>
                                     <Input
                                        disabled
-                                       placeholder={'HEIGHT'}
+                                       placeholder={i18n.t('HEIGHT')}
                                        {...field}
                                        className="h-8 text-sm"
                                     />
@@ -338,12 +394,12 @@ function EditForm({ data, metod = 'POST', onClose, open }: EditFormProps) {
                            name="fileName"
                            render={({ field }) => (
                               <FormItem>
-                                 <FormLabel>{'FILE_NAME'}</FormLabel>
+                                 <FormLabel>{i18n.t('FILE_NAME')}</FormLabel>
                                  <div className="flex flex-row items-center justify-between">
                                     <FormControl>
                                        <Input
                                           disabled
-                                          placeholder={'FILE_NAME'}
+                                          placeholder={i18n.t('FILE_NAME')}
                                           {...field}
                                           className="h-8 text-sm flex rounded-none rounded-l-md"
                                        />
@@ -366,12 +422,12 @@ function EditForm({ data, metod = 'POST', onClose, open }: EditFormProps) {
                            name="path"
                            render={({ field }) => (
                               <FormItem>
-                                 <FormLabel>{'PATH'}</FormLabel>
+                                 <FormLabel>{i18n.t('PATH')}</FormLabel>
                                  <div className="flex flex-row items-center justify-between">
                                     <FormControl>
                                        <Input
                                           disabled
-                                          placeholder={'PATH'}
+                                          placeholder={i18n.t('PATH')}
                                           {...field}
                                           className="h-8 text-sm flex rounded-none rounded-l-md"
                                        />
@@ -394,12 +450,12 @@ function EditForm({ data, metod = 'POST', onClose, open }: EditFormProps) {
                            name="url"
                            render={({ field }) => (
                               <FormItem className="col-span-1 md:col-span-2 w-full">
-                                 <FormLabel>{'URL'}</FormLabel>
+                                 <FormLabel>{i18n.t('URL')}</FormLabel>
                                  <div className="flex flex-row items-center justify-between">
                                     <FormControl>
                                        <Input
                                           disabled
-                                          placeholder={'URL'}
+                                          placeholder={i18n.t('URL')}
                                           {...field}
                                           className="h-8 text-sm flex rounded-none rounded-l-md"
                                        />
@@ -422,17 +478,17 @@ function EditForm({ data, metod = 'POST', onClose, open }: EditFormProps) {
                      <DrawerFooter className="flex flex-row items-center justify-between">
                         {isSubmitting || isPending ? (
                            <Button disabled size={'sm'}>
-                              {'SAVING'}
+                              {i18n.t('SAVING')}
                               <Loader className="ml-2 h-4 w-4 animate-spin" />
                            </Button>
                         ) : (
                            <Button type="submit" size={'sm'}>
-                              {'SAVE'}
+                              {i18n.t('SAVE')}
                            </Button>
                         )}
                         <DrawerClose asChild>
                            <Button variant="outline" size={'sm'}>
-                              {'DONE'}
+                              {i18n.t('DONE')}
                            </Button>
                         </DrawerClose>
                      </DrawerFooter>
@@ -451,8 +507,16 @@ interface FormPageProps {
    open?: boolean;
 }
 
+/**
+ * FormPage component for rendering either the EditForm or DeleteForm based on the method.
+ *
+ * @param data - The image gallery item.
+ * @param metod - The operation method.
+ * @param onClose - Callback fired when the dialog is closed.
+ * @param open - Whether the dialog is open.
+ */
+
 export function FormPage({ data, metod = 'POST', onClose, open }: FormPageProps) {
-   // Hook kurallarını ihlal etmemek için bileşeni iki farklı bileşene böldük
    if (metod === 'DELETE') {
       return <DeleteForm data={data} onClose={onClose} open={open} />;
    }

@@ -1,3 +1,23 @@
+/**
+ * @module UndoRedoSelector
+ *
+ * This module provides the UndoRedoSelector React component for undo and redo actions in the Tiptap editor.
+ * It displays two buttons for undo and redo, enabling or disabling them based on the editor state.
+ * All UI strings should be localized via i18n for multi-language support.
+ *
+ * @remarks
+ * - Integrates with Tiptap editor's undo and redo commands.
+ * - Buttons are disabled if the corresponding action is not available.
+ * - Uses Lucide icons for undo and redo.
+ *
+ * @example
+ * ```tsx
+ * <UndoRedoSelector editor={editor} />
+ * ```
+ *
+ * @property editor - The Tiptap editor instance.
+ */
+
 import { Button } from '@/components/ui/button';
 import { cn } from '../tiptap-utils';
 import { Editor, useEditorState } from '@tiptap/react';
@@ -37,6 +57,7 @@ export const UndoRedoSelector = ({ editor }: { editor: Editor }) => {
                className={cn('size-4', { 'text-blue-500': editor.isActive('math') })}
                strokeWidth={2.3}
             />
+            <span className="sr-only">Undo</span>
          </Button>
          <Button
             variant="ghost"
@@ -49,6 +70,7 @@ export const UndoRedoSelector = ({ editor }: { editor: Editor }) => {
                className={cn('size-4', { 'text-blue-500': editor.isActive('math') })}
                strokeWidth={2.3}
             />
+            <span className="sr-only">Redo</span>
          </Button>
       </div>
    );

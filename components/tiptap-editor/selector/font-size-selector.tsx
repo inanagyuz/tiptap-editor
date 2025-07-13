@@ -1,4 +1,27 @@
 'use client';
+/**
+ * @module FontSizeSelector
+ *
+ * This module provides the FontSizeSelector React component for selecting and customizing font size in the Tiptap editor.
+ * It displays heading levels (H1-H6), paragraph, and allows entering a custom font size with validation.
+ * All UI strings should be localized via i18n for multi-language support.
+ *
+ * @remarks
+ * - Integrates with Tiptap editor's setFontSize, unsetFontSize, setParagraph, and toggleHeading commands.
+ * - Highlights the active heading or font size.
+ * - Shows validation error if custom size is not between 8px and 200px.
+ * - Displays help text for heading and custom size usage.
+ * - Includes a clear button to reset font size or switch to paragraph.
+ *
+ * @example
+ * ```tsx
+ * <FontSizeSelector editor={editor} open={open} onOpenChange={setOpen} />
+ * ```
+ *
+ * @property editor - The Tiptap editor instance.
+ * @property open - Whether the selector popover is open.
+ * @property onOpenChange - Callback fired when the selector is opened or closed.
+ */
 import { Heading1, Heading2, Heading3, Heading4, Heading5, Heading6, Type } from 'lucide-react';
 import { Editor } from '@tiptap/react';
 import { BaseSelector, SelectorItem } from './base-selector';
@@ -7,61 +30,54 @@ import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Check, ChevronDown } from 'lucide-react';
+import { i18n } from '../i18n';
 
-// Preset font boyutları SelectorItem formatında
 const FONT_SIZE_ITEMS: SelectorItem[] = [
    {
       name: 'PARAGRAPH',
       icon: Type,
-      description: 'Normal text',
       command: (editor) => editor?.chain().focus().setParagraph().run(),
       isActive: (editor) => editor?.isActive('paragraph') ?? false,
    },
    {
-      name: 'HEADING_1',
+      name: 'H1',
       icon: Heading1,
       level: 1,
-      description: 'Heading 1',
       command: (editor) => editor?.chain().focus().toggleHeading({ level: 1 }).run(),
       isActive: (editor) => editor?.isActive('heading', { level: 1 }) ?? false,
    },
    {
-      name: 'HEADING_2',
+      name: 'H2',
       icon: Heading2,
       level: 2,
-      description: 'Heading 2',
       command: (editor) => editor?.chain().focus().toggleHeading({ level: 2 }).run(),
       isActive: (editor) => editor?.isActive('heading', { level: 2 }) ?? false,
    },
    {
-      name: 'HEADING_3',
+      name: 'H3',
       icon: Heading3,
       level: 3,
-      description: 'Heading 3',
       command: (editor) => editor?.chain().focus().toggleHeading({ level: 3 }).run(),
       isActive: (editor) => editor?.isActive('heading', { level: 3 }) ?? false,
    },
    {
-      name: 'HEADING_4',
+      name: 'H4',
       icon: Heading4,
       level: 4,
-      description: 'Heading 4',
       command: (editor) => editor?.chain().focus().toggleHeading({ level: 4 }).run(),
       isActive: (editor) => editor?.isActive('heading', { level: 4 }) ?? false,
    },
    {
-      name: 'HEADING_5',
+      name: 'H5',
       icon: Heading5,
       level: 5,
-      description: 'Heading 5',
       command: (editor) => editor?.chain().focus().toggleHeading({ level: 5 }).run(),
       isActive: (editor) => editor?.isActive('heading', { level: 5 }) ?? false,
    },
    {
-      name: 'HEADING_6',
+      name: 'H6',
       icon: Heading6,
       level: 6,
-      description: 'Heading 6',
       command: (editor) => editor?.chain().focus().toggleHeading({ level: 6 }).run(),
       isActive: (editor) => editor?.isActive('heading', { level: 6 }) ?? false,
    },
@@ -104,7 +120,6 @@ export const FontSizeSelector = ({ editor, open, onOpenChange }: FontSizeSelecto
       const activeHeadingLevel = getActiveHeading();
       const activePreset = FONT_SIZE_ITEMS.find((item) => item.isActive(editor));
 
-      // ✅ Eğer heading aktifse, heading göster
       if (activeHeadingLevel) {
          const HeadingIcon = activePreset?.icon || Type;
          return (
@@ -116,7 +131,6 @@ export const FontSizeSelector = ({ editor, open, onOpenChange }: FontSizeSelecto
          );
       }
 
-      // ✅ Normal paragraph ise font size göster
       return (
          <>
             <span className="text-xs font-medium">{currentSizeNumber}px</span>
@@ -129,7 +143,7 @@ export const FontSizeSelector = ({ editor, open, onOpenChange }: FontSizeSelecto
    const validateCustomSize = (size: string): boolean => {
       const num = parseInt(size);
       if (isNaN(num) || num < 8 || num > 200) {
-         setValidationError('Font boyutu 8px ile 200px arasında olmalıdır');
+         setValidationError(i18n.t('FONTSIZE_RANGE_ERROR'));
          return false;
       }
       setValidationError('');
@@ -151,7 +165,7 @@ export const FontSizeSelector = ({ editor, open, onOpenChange }: FontSizeSelecto
          {/* Custom Size Input - sadece paragraph için göster */}
          {!getActiveHeading() && (
             <div className="mb-4">
-               <div className="text-xs text-muted-foreground mb-2">{'CUSTOM_SIZE'}</div>
+               <div className="text-xs text-muted-foreground mb-2">{i18n.t('CUSTOM_SIZE')}</div>
                <div className="flex gap-0 items-center max-w-30">
                   <Input
                      ref={inputRef}
@@ -195,9 +209,7 @@ export const FontSizeSelector = ({ editor, open, onOpenChange }: FontSizeSelecto
          {/* Help Text */}
          <div className="text-xs text-muted-foreground">
             💡 İpucu:{' '}
-            {getActiveHeading()
-               ? 'Normal text için yukarıdaki "Normal text" seçeneğini tıklayın.'
-               : 'Enter tuşu ile hızlı uygulama yapabilirsiniz'}
+            {getActiveHeading() ? i18n.t('FONTSIZE_HELP_HEADING') : i18n.t('FONTSIZE_HELP_ENTER')}
          </div>
       </>
    );

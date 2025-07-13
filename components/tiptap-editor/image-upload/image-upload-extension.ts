@@ -1,3 +1,29 @@
+/**
+ * @module ImageUpload
+ *
+ * This module provides the ImageUpload TipTap node extension for uploading images directly within the editor.
+ * It supports custom upload logic, file type and size restrictions, progress callbacks, and error handling.
+ *
+ * @remarks
+ * - Allows users to upload images via a custom upload function.
+ * - Supports limiting file types, file size, and number of uploads.
+ * - Provides callbacks for upload progress, success, and error events.
+ * - Includes keyboard shortcut (Enter) to trigger upload when the node is selected.
+ * - All UI strings should be localized via i18n for multi-language support.
+ *
+ * @example
+ * ```tsx
+ * editor.commands.setImageUploadNode({ accept: 'image/png', limit: 3, maxSize: 1048576, upload: customUploadFn })
+ * ```
+ *
+ * @property accept - Acceptable file types for upload (default: 'image/*').
+ * @property limit - Maximum number of files that can be uploaded (default: 1).
+ * @property maxSize - Maximum file size in bytes (default: 0 for unlimited).
+ * @property upload - Function to handle the upload process.
+ * @property onError - Callback for upload errors.
+ * @property onSuccess - Callback for successful uploads.
+ */
+
 import { mergeAttributes, Node, ReactNodeViewRenderer } from '@tiptap/react';
 import { ImageUploadNode } from './image-upload';
 

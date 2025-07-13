@@ -1,3 +1,27 @@
+/**
+ * @module AlbumArtwork
+ *
+ * This module provides the AlbumArtwork React component for displaying image gallery items with artwork, name, and actions.
+ * It supports portrait and square aspect ratios, custom dimensions, and fallback rendering when no image is available.
+ *
+ * @remarks
+ * - Displays image artwork using Next.js Image component.
+ * - Shows album name or a localized fallback if not available.
+ * - Includes edit and delete actions with modal dialogs.
+ * - All UI strings should be localized via i18n for multi-language support.
+ *
+ * @example
+ * ```tsx
+ * <AlbumArtwork album={album} aspectRatio="portrait" width={200} height={300} />
+ * ```
+ *
+ * @property album - The image gallery item to display.
+ * @property aspectRatio - Aspect ratio of the artwork ('portrait' or 'square').
+ * @property width - Width of the image.
+ * @property height - Height of the image.
+ * @property className - Custom CSS class for the container.
+ */
+
 import React from 'react';
 import Image from 'next/image';
 import { Ban, Edit, Trash } from 'lucide-react';
@@ -5,6 +29,7 @@ import { ImageGallerySchema } from '@/schemas/image-gallery';
 import { cn } from '@/lib/utils';
 import { FormPage } from './form';
 import { Button } from '@/components/ui/button';
+import { i18n } from '../i18n';
 
 interface AlbumArtworkProps extends React.HTMLAttributes<HTMLDivElement> {
    album: ImageGallerySchema;
@@ -12,6 +37,16 @@ interface AlbumArtworkProps extends React.HTMLAttributes<HTMLDivElement> {
    width?: number;
    height?: number;
 }
+
+/**
+ * AlbumArtwork component displays an image gallery item with artwork, name, and actions.
+ *
+ * @param album - The image gallery item to display.
+ * @param aspectRatio - Aspect ratio of the artwork ('portrait' or 'square').
+ * @param width - Width of the image.
+ * @param height - Height of the image.
+ * @param className - Custom CSS class for the container.
+ */
 
 export function AlbumArtwork({
    album,
@@ -56,7 +91,7 @@ export function AlbumArtwork({
          </div>
          <div className="flex flex-row justify-between items-center p-2 bg-muted/50 rounded-b-md">
             <span className="text-sm truncate flex flex-row items-center">
-               {album?.name || 'NO_NAME'}
+               {album?.name || i18n.t('NO_NAME')}
             </span>
             <div className="flex flex-row items-center">
                <Action data={album} />
@@ -66,9 +101,20 @@ export function AlbumArtwork({
    );
 }
 
+/**
+ * Props for the Action component.
+ *
+ * @property data - The image gallery item for actions.
+ */
 interface ActionProps {
    data: ImageGallerySchema;
 }
+
+/**
+ * Action component provides edit and delete actions for an image gallery item.
+ *
+ * @param data - The image gallery item for actions.
+ */
 
 export function Action({ data }: ActionProps) {
    const [openDrawer, setOpenDrawer] = React.useState(false);

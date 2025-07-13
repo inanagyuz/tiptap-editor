@@ -1,5 +1,28 @@
 'use client';
 
+/**
+ * @module ContextAI
+ *
+ * This module provides the ContextAI React component and command for AI-powered content generation and editing in the Tiptap editor.
+ * It supports multi-language UI via i18n, quick text commands, smart context tools, and resource integration.
+ *
+ * @remarks
+ * - Integrates with AI backend for text completion and context-aware suggestions.
+ * - Includes quick commands (continue, improve, summarize, expand, fix grammar, change tone, translate).
+ * - Provides smart context tools (project analysis, code search, documentation reading, database query, code analysis).
+ * - Displays context resources and allows interaction with them.
+ * - All UI strings are localized via i18n.
+ * - Includes a dialog command for opening the ContextAI interface.
+ *
+ * @example
+ * ```tsx
+ * <ContextAI editor={editor} onOpenChange={handleClose} />
+ * ```
+ *
+ * @property editor - The Tiptap editor instance.
+ * @property onOpenChange - Callback fired when the dialog is opened or closed.
+ */
+
 import { type Editor } from '@tiptap/react';
 import {
    ArrowUp,
@@ -41,11 +64,23 @@ import {
    DialogDescription,
 } from '@/components/ui/dialog';
 import React from 'react';
+import { i18n } from '../i18n';
+
+/**
+ * Props for the ContextAI component.
+ *
+ * @property editor - The Tiptap editor instance.
+ * @property onOpenChange - Callback fired when the dialog is opened or closed.
+ */
 
 interface ContextAIProps {
    editor: Editor;
    onOpenChange: (open: boolean) => void;
 }
+
+/**
+ * Resource interface for MCP context resources.
+ */
 
 interface MCPResource {
    uri: string;
@@ -53,6 +88,14 @@ interface MCPResource {
    description: string;
    type: 'file' | 'database' | 'api' | 'project';
 }
+
+
+/**
+ * ContextAI component provides AI-powered content generation and editing for the Tiptap editor.
+ *
+ * @param editor - The Tiptap editor instance.
+ * @param onOpenChange - Callback fired when the dialog is opened or closed.
+ */
 
 interface MCPTool {
    name: string;
@@ -69,23 +112,23 @@ export function ContextAI({ editor, onOpenChange }: ContextAIProps) {
 
    const apiUrl = process.env.NEXT_PUBLIC_AI_API;
    if (!apiUrl) {
-      throw new Error('NO_IMAGE_GALLERY_URL');
+      throw new Error('NEXT_PUBLIC_AI_API environment variable is not set');
    }
 
    const { completion, complete, isLoading, setCompletion } = useCompletion({
       api: `${apiUrl}/generate`,
+      onError: (error) => {
+         console.error('🚨 Completion error:', error);
+      },
    });
 
    const hasCompletion = completion.length > 0;
 
-   // Yeniden deneme işlevi
    const handleRetry = () => {
-      setCompletion(''); // Completion'ı temizle
-      setInputValue(''); // Input'u da temizle
-      // Pencereyi kapatma, sadece seçeneklere geri dön
+      setCompletion('');
+      setInputValue('');
    };
 
-   // Seçili metni kontrol et
    const getSelectedText = () => {
       const selection = editor.state.selection;
       return editor.state.doc.textBetween(selection.from, selection.to);
@@ -94,89 +137,86 @@ export function ContextAI({ editor, onOpenChange }: ContextAIProps) {
    const selectedText = getSelectedText();
    const hasSelectedText = selectedText.trim().length > 0;
 
-   // Hızlı Metin Komutları
    const quickTextCommands = [
       {
          name: 'continue',
-         label: 'Metni Devam Ettir',
-         description: 'Metni bağlama uygun şekilde devam ettir',
+         label: i18n.t('AI_CONTINUE_LABEL'),
+         description: i18n.t('AI_CONTINUE_DESC'),
          icon: ArrowRight,
-         command: 'Bu metni bağlama uygun şekilde devam ettir',
+         command: i18n.t('AI_CONTINUE_COMMAND'),
          isTranslation: false,
       },
       {
          name: 'improve',
-         label: 'Metni İyileştir',
-         description: 'Seçili metni daha akıcı hale getir',
+         label: i18n.t('AI_IMPROVE_LABEL'),
+         description: i18n.t('AI_IMPROVE_DESC'),
          icon: Wand2,
-         command: 'Bu metni daha akıcı, net ve anlaşılır hale getir',
+         command: i18n.t('AI_IMPROVE_COMMAND'),
          isTranslation: false,
       },
       {
          name: 'summarize',
-         label: 'Özetle',
-         description: 'Metni kısaca özetle',
+         label: i18n.t('AI_SUMMARIZE_LABEL'),
+         description: i18n.t('AI_SUMMARIZE_DESC'),
          icon: ArrowDownWideNarrow,
-         command: 'Bu metni ana noktalarını koruyarak özetle',
+         command: i18n.t('AI_SUMMARIZE_COMMAND'),
          isTranslation: false,
       },
       {
          name: 'expand',
-         label: 'Genişlet',
-         description: 'Metni daha detaylandır',
+         label: i18n.t('AI_EXPAND_LABEL'),
+         description: i18n.t('AI_EXPAND_DESC'),
          icon: ArrowUpWideNarrow,
-         command: 'Bu metni daha detaylı ve kapsamlı hale getir',
+         command: i18n.t('AI_EXPAND_COMMAND'),
          isTranslation: false,
       },
       {
          name: 'fix_grammar',
-         label: 'Dilbilgisi Düzelt',
-         description: 'Yazım ve dilbilgisi hatalarını düzelt',
+         label: i18n.t('AI_FIX_GRAMMAR_LABEL'),
+         description: i18n.t('AI_FIX_GRAMMAR_DESC'),
          icon: CheckCheck,
-         command: 'Bu metindeki yazım ve dilbilgisi hatalarını düzelt',
+         command: i18n.t('AI_FIX_GRAMMAR_COMMAND'),
          isTranslation: false,
       },
       {
          name: 'change_tone',
-         label: 'Tonunu Değiştir',
-         description: 'Metni daha resmi/samimi yap',
+         label: i18n.t('AI_CHANGE_TONE_LABEL'),
+         description: i18n.t('AI_CHANGE_TONE_DESC'),
          icon: Type,
-         command: 'Bu metni daha profesyonel bir ton ile yeniden yaz',
+         command: i18n.t('AI_CHANGE_TONE_COMMAND'),
          isTranslation: false,
       },
       {
          name: 'translate_english',
-         label: 'İngilizceye Çevir',
-         description: "Metni İngilizce'ye çevir",
+         label: i18n.t('AI_TRANSLATE_ENGLISH_LABEL'),
+         description: i18n.t('AI_TRANSLATE_ENGLISH_DESC'),
          icon: Languages,
-         command: "Bu metni İngilizce'ye çevir",
+         command: i18n.t('AI_CHANGE_TONE_LABEL'),
          isTranslation: true,
       },
       {
          name: 'translate_turkish',
-         label: 'Türkçeye Çevir',
-         description: "Metni Türkçe'ye çevir",
+         label: i18n.t('AI_TRANSLATE_TURKISH_LABEL'),
+         description: i18n.t('AI_TRANSLATE_TURKISH_DESC'),
          icon: Languages,
-         command: "Bu metni Türkçe'ye çevir",
+         command: i18n.t('AI_TRANSLATE_TURKISH_COMMAND'),
          isTranslation: true,
       },
       {
          name: 'translate_german',
-         label: 'Almancaya Çevir',
-         description: "Metni Almanca'ya çevir",
+         label: i18n.t('AI_TRANSLATE_GERMAN_LABEL'),
+         description: i18n.t('AI_TRANSLATE_GERMAN_DESC'),
          icon: Languages,
-         command: "Bu metni Almanca'ya çevir",
+         command: i18n.t('AI_TRANSLATE_GERMAN_COMMAND'),
          isTranslation: true,
       },
    ];
 
    const handleQuickCommand = async (command: (typeof quickTextCommands)[0]) => {
-      // Selection'u al
       const selection = editor.state.selection;
       const selectedText = editor.state.doc.textBetween(selection.from, selection.to);
 
       if (!selectedText.trim()) {
-         // Eğer seçili metin yoksa kullanıcıyı uyar
          alert('Lütfen düzenlemek istediğiniz metni seçin');
          return;
       }
@@ -219,31 +259,31 @@ export function ContextAI({ editor, onOpenChange }: ContextAIProps) {
    const mcpTools: MCPTool[] = [
       {
          name: 'analyze_project',
-         description: 'Proje Yapısını Analiz Et',
+         description: i18n.t('MCP_ANALYZE_PROJECT'),
          icon: Brain,
          action: 'project_analysis',
       },
       {
          name: 'search_codebase',
-         description: 'Kod Tabanında Ara',
+         description: i18n.t('MCP_SEARCH_CODEBASE'),
          icon: Search,
          action: 'code_search',
       },
       {
          name: 'read_documentation',
-         description: 'Dokümantasyon Oku',
+         description: i18n.t('MCP_READ_DOCUMENTATION'),
          icon: FileText,
          action: 'doc_read',
       },
       {
          name: 'query_database',
-         description: 'Veritabanı Sorgula',
+         description: i18n.t('MCP_QUERY_DATABASE'),
          icon: Database,
          action: 'db_query',
       },
       {
          name: 'analyze_code',
-         description: 'Kod Analizi Yap',
+         description: i18n.t('MCP_ANALYZE_CODE'),
          icon: Code,
          action: 'code_analysis',
       },
@@ -525,9 +565,7 @@ export function ContextAI({ editor, onOpenChange }: ContextAIProps) {
                      MCP Powered
                   </span>
                </div>
-               <p className="text-xs text-purple-700 mt-1">
-                  Akıllı bağlam analizi ile güçlendirilmiş AI asistanı
-               </p>
+               <p className="text-xs text-purple-700 mt-1">{i18n.t('AI_ASSISTANT_DESC')}</p>
             </div>
 
             {(isLoading || mcpLoading) && (
@@ -535,7 +573,7 @@ export function ContextAI({ editor, onOpenChange }: ContextAIProps) {
                   <CommandItem disabled>
                      <div className="flex items-center gap-2 text-muted-foreground">
                         <CrazySpinner />
-                        {mcpLoading ? 'MCP analiz ediyor...' : 'AI düşünüyor...'}
+                        {mcpLoading ? i18n.t('MCP_ANALYZING') : i18n.t('AI_THINKING')}
                      </div>
                   </CommandItem>
                </CommandGroup>
@@ -553,8 +591,8 @@ export function ContextAI({ editor, onOpenChange }: ContextAIProps) {
                               value={inputValue}
                               placeholder={
                                  hasCompletion
-                                    ? 'Sonraki talimatı verin...'
-                                    : "AI'ya ne yapmasını istiyorsunuz?"
+                                    ? i18n.t('AI_NEXT_INSTRUCTION')
+                                    : i18n.t('AI_INPUT_PLACEHOLDER')
                               }
                               onKeyDown={(e) => {
                                  if (e.key === 'Enter') {
@@ -585,13 +623,13 @@ export function ContextAI({ editor, onOpenChange }: ContextAIProps) {
                         <CommandSeparator />
                         <CommandGroup>
                            <div className="px-2 py-1 text-xs font-medium text-muted-foreground">
-                              ✨ Hızlı Metin Komutları
+                              {i18n.t('QUICK_COMMANDS_TITLE')}
                            </div>
                            {!hasSelectedText && (
                               <CommandItem disabled>
                                  <div className="w-full text-center">
                                     <div className="text-sm text-muted-foreground">
-                                       Lütfen düzenlemek istediğiniz metni seçin
+                                       {i18n.t('AI_SELECT_TEXT_ALERT')}
                                     </div>
                                  </div>
                               </CommandItem>
@@ -627,7 +665,7 @@ export function ContextAI({ editor, onOpenChange }: ContextAIProps) {
                         <CommandSeparator />
                         <CommandGroup>
                            <div className="px-2 py-1 text-xs font-medium text-muted-foreground">
-                              🧠 Akıllı Bağlam Araçları
+                              {i18n.t('MCP_TOOLS_TITLE')}
                            </div>
                            {mcpTools.map((tool) => {
                               const IconComponent = tool.icon;
@@ -661,7 +699,7 @@ export function ContextAI({ editor, onOpenChange }: ContextAIProps) {
                         <CommandSeparator />
                         <CommandGroup>
                            <div className="px-2 py-1 text-xs font-medium text-muted-foreground">
-                              📁 Bağlam Kaynakları
+                              {i18n.t('MCP_RESOURCES_TITLE')}
                            </div>
                            {mcpResources.slice(0, 3).map((resource) => (
                               <CommandItem key={resource.uri}>
@@ -727,7 +765,9 @@ export function ContextAI({ editor, onOpenChange }: ContextAIProps) {
                                  className="w-full text-left rounded flex items-center gap-2 bg-green-50 hover:bg-green-100 p-2 transition-colors"
                               >
                                  <SquareCheck className="h-4 w-4 text-green-600" />
-                                 <span className="text-green-700 font-medium">Kabul Et</span>
+                                 <span className="text-green-700 font-medium">
+                                    {i18n.t('AI_ACCEPT')}
+                                 </span>
                               </button>
                            </CommandItem>
                            <CommandItem>
@@ -736,7 +776,7 @@ export function ContextAI({ editor, onOpenChange }: ContextAIProps) {
                                  className="w-full text-left rounded flex items-center gap-2 hover:bg-accent p-2 transition-colors"
                               >
                                  <RefreshCcwDot className="h-4 w-4 text-orange-500" />
-                                 <span>Yeniden Dene</span>
+                                 <span>{i18n.t('AI_RETRY')}</span>
                               </button>
                            </CommandItem>
                         </CommandGroup>
@@ -749,8 +789,14 @@ export function ContextAI({ editor, onOpenChange }: ContextAIProps) {
    );
 }
 
-export // ContextAI Command Function
-const contextAICommand = ({ editor }: { editor: Editor }) => {
+/**
+ * ContextAI command function.
+ * Opens the ContextAI dialog for AI-powered content generation and editing.
+ *
+ * @param editor - The Tiptap editor instance.
+ */
+
+export const contextAICommand = ({ editor }: { editor: Editor }) => {
    try {
       // Create a container for the dialog
       const container = document.createElement('div');
@@ -797,7 +843,9 @@ const contextAICommand = ({ editor }: { editor: Editor }) => {
                         <Sparkles className="w-5 h-5 text-purple-500" />
                      </DialogTitle>
                      <DialogDescription className="hidden">
-                        ContextAI ile içerik oluşturma ve düzenleme
+                       {
+                           i18n.t('CONTEXT_AI_DIALOG_DESC')
+                       }
                      </DialogDescription>
                   </DialogHeader>
                   <QueryClientProvider client={queryClient}>

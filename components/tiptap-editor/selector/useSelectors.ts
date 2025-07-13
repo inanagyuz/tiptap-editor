@@ -1,4 +1,24 @@
-// hooks/useSelectors.ts
+/**
+ * @module useSelectors
+ *
+ * This custom React hook manages the open/close state for all selector popovers in the Tiptap editor UI.
+ * It provides state and handlers for alignment, link, color, font family, font size, import/export, table, image, line height, YouTube, Twitter, and more.
+ * Includes a `closeAll` function to close all selectors at once.
+ *
+ * @remarks
+ * - Each selector returns `{ open, onOpenChange }` for controlling its visibility.
+ * - The `image` selector also manages gallery and URL sub-selectors.
+ * - Designed for use in toolbar and floating UI components.
+ *
+ * @example
+ * ```tsx
+ * const selectors = useSelectors();
+ * selectors.link.onOpenChange(true); // Open link selector
+ * selectors.closeAll(); // Close all selectors
+ * ```
+ *
+ * @returns An object with open state and change handlers for each selector, plus a `closeAll` function.
+ */
 import { useState } from 'react';
 
 export const useSelectors = () => {
@@ -64,8 +84,7 @@ export const useSelectors = () => {
          open: isTwitterSelectorOpen,
          onOpenChange: setIsTwitterSelectorOpen,
       },
-
-      // Tüm selector'ları kapatmak için fonksiyon
+      
       closeAll,
    };
 };

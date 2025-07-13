@@ -1,9 +1,64 @@
+/**
+ * @module BaseSelector
+ *
+ * This module provides the BaseSelector React component for rendering a generic popover selector UI in the Tiptap editor.
+ * It supports single and multi-select, custom icons, descriptions, quick actions, and optimized state handling.
+ * All UI strings should be localized via i18n for multi-language support.
+ *
+ * @remarks
+ * - Integrates with Tiptap editor and supports optimized state selection.
+ * - Renders selectable items with icons, descriptions, shortcuts, and levels.
+ * - Supports custom trigger content, quick actions, and additional content.
+ * - Includes a clear button for multi-select scenarios.
+ * - Uses memoization for performance optimization.
+ *
+ * @example
+ * ```tsx
+ * <BaseSelector
+ *   editor={editor}
+ *   open={open}
+ *   onOpenChange={setOpen}
+ *   items={items}
+ *   showText={true}
+ *   showDescription={true}
+ *   showClearButton={true}
+ *   clearAllCommand={clearAll}
+ * />
+ * ```
+ *
+ * @property editor - The Tiptap editor instance.
+ * @property open - Whether the selector popover is open.
+ * @property onOpenChange - Callback fired when the selector is opened or closed.
+ * @property items - Array of selector items to display.
+ * @property placeholder - Placeholder text for the trigger.
+ * @property showText - Whether to show item text in the trigger.
+ * @property showLevel - Whether to show item level.
+ * @property showDescription - Whether to show item description.
+ * @property showShortcut - Whether to show item shortcut.
+ * @property additionalContent - Additional content to render below the items.
+ * @property width - Custom width for the popover content.
+ * @property triggerClassName - Custom class for the trigger button.
+ * @property contentClassName - Custom class for the popover content.
+ * @property itemClassName - Custom class for each item.
+ * @property iconSize - Icon size ('sm', 'md', 'lg').
+ * @property multiSelect - Enables multi-select mode.
+ * @property showClearButton - Shows a clear all button.
+ * @property clearAllCommand - Command to clear all selections.
+ * @property customTriggerContent - Custom render function for the trigger.
+ * @property headerTitle - Optional header title for the popover.
+ * @property showQuickActions - Shows quick action buttons.
+ * @property quickActions - Array of quick action configs.
+ * @property renderItem - Custom render function for items.
+ * @property enableOptimization - Enables state optimization.
+ * @property stateSelector - Custom selector for editor state.
+ */
 import { Check, ChevronDown, X, type LucideIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { type Editor, useEditorState } from '@tiptap/react';
 import { cn } from '@/lib/utils';
 import { useMemo } from 'react';
+import { i18n } from '../i18n';
 
 export interface SelectorItem {
    name: string;
@@ -270,12 +325,12 @@ export const BaseSelector = ({
                </div>
             )}
             <div className="flex flex-col items-start">
-               <span className="text-xs font-medium">{item.name}</span>
+               <span className="text-xs font-medium">{i18n.t(item?.name)}</span>
                {showLevel && item.level && (
                   <span className="text-xs text-muted-foreground">Level {item.level}</span>
                )}
                {showDescription && item.description && (
-                  <span className="text-xs text-muted-foreground">{item.description}</span>
+                  <span className="text-xs text-muted-foreground">{i18n.t(item?.description)}</span>
                )}
                {showShortcut && item.shortcut && (
                   <span className="text-xs text-muted-foreground">{item.shortcut}</span>
@@ -296,7 +351,7 @@ export const BaseSelector = ({
          if (activeItems.length === 0) {
             return (
                <>
-                  <span className="text-xs text-muted-foreground">{placeholder}</span>
+                  <span className="text-xs text-muted-foreground">{i18n.t(placeholder)}</span>
                   <ChevronDown className="h-3 w-3" />
                </>
             );
@@ -307,7 +362,9 @@ export const BaseSelector = ({
                <>
                   {item.icon && <item.icon className={iconSizeClasses[iconSize]} />}
                   {showText && (
-                     <span className="text-xs hidden sm:inline">{item.value || item.name}</span>
+                     <span className="text-xs hidden sm:inline">
+                        {i18n.t(item?.value ?? item?.name, item?.name)}
+                     </span>
                   )}
                   <ChevronDown className="h-3 w-3" />
                </>
@@ -315,7 +372,9 @@ export const BaseSelector = ({
          }
          return (
             <>
-               <span className="text-xs">{activeItems.length} selected</span>
+               <span className="text-xs">
+                  {activeItems.length} {i18n.t('SELECTED')}
+               </span>
                <ChevronDown className="h-3 w-3" />
             </>
          );
@@ -328,7 +387,7 @@ export const BaseSelector = ({
                {activeItem.icon && <activeItem.icon className={iconSizeClasses[iconSize]} />}
                {showText && (
                   <span className="text-xs hidden sm:inline">
-                     {activeItem.value || activeItem.name}
+                     {i18n.t(activeItem?.value ?? activeItem?.name, activeItem?.name)}
                   </span>
                )}
                {showLevel && activeItem.level && (
@@ -345,7 +404,9 @@ export const BaseSelector = ({
                <firstActiveItem.icon className={iconSizeClasses[iconSize]} />
             )}
             {showText && (
-               <span className="text-xs hidden sm:inline text-muted-foreground">{placeholder}</span>
+               <span className="text-xs hidden sm:inline text-muted-foreground">
+                  {i18n.t(placeholder)}
+               </span>
             )}
             <ChevronDown className="h-3 w-3" />
          </>
@@ -387,8 +448,8 @@ export const BaseSelector = ({
             {(headerTitle || (showClearButton && activeItems.length > 0)) && (
                <div className="flex items-center justify-between mb-2 px-2 border-b pb-2">
                   {headerTitle && (
-                     <div className="text-sm font-semibold text-muted-foreground">
-                        {headerTitle}
+                     <div className="text-sm font-semibold text-muted-foreground">                       
+                          {i18n.t(headerTitle)}
                      </div>
                   )}
                   {showClearButton && activeItems.length > 0 && clearAllCommand && (
@@ -399,7 +460,7 @@ export const BaseSelector = ({
                         className="h-6 px-2 text-xs text-red-600 hover:bg-red-50"
                      >
                         <X className="h-3 w-3 mr-1" />
-                        {'CLEAR_ALL'}
+                        {i18n.t('CLEAR_ALL')}
                      </Button>
                   )}
                </div>

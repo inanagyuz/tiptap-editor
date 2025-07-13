@@ -1,3 +1,24 @@
+
+/**
+ * @module MathSelector
+ *
+ * This module provides the MathSelector React component for toggling mathematical expressions in the Tiptap editor.
+ * It allows users to convert selected text to inline math or revert math nodes back to plain LaTeX text.
+ * All UI strings should be localized via i18n for multi-language support.
+ *
+ * @remarks
+ * - Checks for active math nodes (math, inlineMath, blockMath).
+ * - If a math node is active, converts it back to LaTeX text.
+ * - If no math node is active, converts selected text to an inline math node.
+ * - Uses SigmaIcon for the button.
+ *
+ * @example
+ * ```tsx
+ * <MathSelector editor={editor} />
+ * ```
+ *
+ * @property editor - The Tiptap editor instance.
+ */
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { Editor } from '@tiptap/react';
@@ -15,14 +36,14 @@ export const MathSelector = ({ editor }: { editor: Editor }) => {
          className="rounded-none w-10"
          onClick={() => {
             if (isActiveMath) {
-               // Matematik düğümünü düz metne dönüştür
+                
                const { state } = editor;
                const { from, to } = state.selection;
 
                let mathNode = null;
                let mathPos = null;
 
-               // inlineMath düğümünü bul
+       
                state.doc.nodesBetween(from, to, (node, pos) => {
                   if (mathTypes.includes(node.type.name)) {
                      if (node.attrs?.latex) {
@@ -40,23 +61,22 @@ export const MathSelector = ({ editor }: { editor: Editor }) => {
                   editor
                      .chain()
                      .focus()
-                     .setNodeSelection(mathPos) // Matematik düğümünü seç
-                     .deleteSelection() // Sil
-                     .insertContent(latex) // Düz metin olarak ekle
+                     .setNodeSelection(mathPos)  
+                     .deleteSelection()  
+                     .insertContent(latex)  
                      .run();
                }
             } else {
-               // Düz metni matematik ifadesine dönüştür
+               
                const { from, to } = editor.state.selection;
                const latex = editor.state.doc.textBetween(from, to);
 
-               if (!latex.trim()) return; // Boş metin kontrolü
-
+               if (!latex.trim()) return;  
                editor
                   .chain()
                   .focus()
-                  .deleteSelection() // Seçili metni sil
-                  .insertInlineMath({ latex }) // Matematik ifadesi olarak ekle
+                  .deleteSelection()  
+                  .insertInlineMath({ latex }) 
                   .run();
             }
          }}

@@ -53,6 +53,8 @@ npx shadcn@latest add alert-dialog
 npx shadcn@latest add switch
 npx shadcn@latest add scroll-area
 npx shadcn@latest add command
+npx shadcn@latest add textarea
+npx shadcn@latest add tabs
 
 ## Ohter
 
@@ -67,8 +69,13 @@ npm install lowlight
 npm i highlight.js
 npm i use-debounce --save
 npm i react-markdown
-npm install ai @ai-sdk/react @ai-sdk/openai
+npm install ai@beta @ai-sdk/openai@beta @ai-sdk/react@beta
 npm i ts-pattern
+npm i @floating-ui/dom
+npm i file-saver
+npm i html-to-docx
+npm i cheerio
+npm i mammoth
 
 ## Tiptap
 
@@ -91,3 +98,5 @@ npm i @tiptap/extension-typography@3.0.0-beta.21
 npm i @tiptap/extensions@3.0.0-beta.21
 npm i @tiptap/extension-link@3.0.0-beta.21
 npm i @tiptap/extension-image@3.0.0-beta.21
+npm install @tiptap/suggestion@3.0.0-beta.21
+npm install @tiptap/extension-table@3.0.0-beta.21

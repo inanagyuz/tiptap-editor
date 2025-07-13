@@ -1,3 +1,26 @@
+/**
+ * @module LinkSelector
+ *
+ * This module provides the LinkSelector React component for adding, editing, and validating links in the Tiptap editor.
+ * It includes security checks for protocols and domains, displays current link info, and allows setting link targets.
+ * All UI strings should be localized via i18n for multi-language support.
+ *
+ * @remarks
+ * - Validates URLs for allowed protocols (HTTP/HTTPS) and blocks suspicious domains.
+ * - Supports adding links to selected text or inserting as new text.
+ * - Displays validation errors and security warnings.
+ * - Allows removing links and changing link target (_self, _blank).
+ * - Shows preview of display text for the link.
+ *
+ * @example
+ * ```tsx
+ * <LinkSelector editor={editor} open={open} onOpenChange={setOpen} />
+ * ```
+ *
+ * @property editor - The Tiptap editor instance.
+ * @property open - Whether the selector popover is open.
+ * @property onOpenChange - Callback fired when the selector is opened or closed.
+ */
 'use client';
 import { Button } from '@/components/ui/button';
 import { PopoverContent } from '@/components/ui/popover';
@@ -7,6 +30,7 @@ import { Editor } from '@tiptap/react';
 import { Check, Trash, Link, AlertTriangle } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { Input } from '@/components/ui/input';
+import { i18n } from '../i18n';
 
 // Güvenlik kontrolleri
 const DISALLOWED_PROTOCOLS = ['ftp', 'file', 'mailto'];
@@ -48,14 +72,16 @@ export function validateUrl(url: string): { isValid: boolean; error?: string } {
       if (DISALLOWED_PROTOCOLS.includes(protocol)) {
          return {
             isValid: false,
-            error: `${protocol.toUpperCase()} protokolüne izin verilmiyor`,
+            error: i18n
+               .t('LINK_ERROR_PROTOCOL_NOT_ALLOWED')
+               .replace('{protocol}', protocol.toString()),
          };
       }
 
       if (!ALLOWED_PROTOCOLS.includes(protocol)) {
          return {
             isValid: false,
-            error: `Sadece HTTP ve HTTPS protokollerine izin veriliyor`,
+            error: i18n.t('LINK_ERROR_ONLY_HTTP_HTTPS'),
          };
       }
 
@@ -63,14 +89,14 @@ export function validateUrl(url: string): { isValid: boolean; error?: string } {
       if (DISALLOWED_DOMAINS.includes(domain)) {
          return {
             isValid: false,
-            error: `Bu domain güvenlik nedeniyle engellendi: ${domain}`,
+            error: i18n.t('LINK_ERROR_BLOCKED_DOMAIN').replace('{protocol}', domain),
          };
       }
 
       if (domain.includes('phishing') || domain.includes('malware')) {
          return {
             isValid: false,
-            error: `Şüpheli domain tespit edildi: ${domain}`,
+            error: i18n.t('LINK_ERROR_SUSPICIOUS_DOMAIN').replace('{protocol}', domain),
          };
       }
 
@@ -78,7 +104,7 @@ export function validateUrl(url: string): { isValid: boolean; error?: string } {
       if (ipRegex.test(domain)) {
          return {
             isValid: false,
-            error: `IP adresi linklerine izin verilmiyor`,
+            error: i18n.t('LINK_ERROR_IP_NOT_ALLOWED'),
          };
       }
 
@@ -87,7 +113,7 @@ export function validateUrl(url: string): { isValid: boolean; error?: string } {
    } catch (error) {
       return {
          isValid: false,
-         error: 'Geçersiz URL formatı',
+         error: i18n.t('LINK_ERROR_INVALID_FORMAT'),
       };
    }
 }
@@ -141,7 +167,7 @@ export const LinkSelector = ({ editor, open, onOpenChange }: LinkSelectorProps) 
 
       const validation = validateUrl(url);
       if (!validation.isValid) {
-         setValidationError(validation.error || 'Geçersiz URL');
+         setValidationError(validation.error || i18n.t('LINK_ERROR_INVALID_FORMAT'));
          return;
       }
 
@@ -233,10 +259,11 @@ export const LinkSelector = ({ editor, open, onOpenChange }: LinkSelectorProps) 
             <div className="p-4">
                <div className="space-y-3">
                   <div>
-                     {/* ✅ Seçili metin varsa göster */}
                      {hasSelection && (
                         <div className="mb-2 p-1 bg-muted/50 rounded text-xs">
-                           <span className="text-muted-foreground">Seçili metin: </span>
+                           <span className="text-muted-foreground">
+                              {i18n.t('LINK_SELECTOR_SELECTED_TEXT_LABEL')}
+                           </span>
                            <span className="font-medium">{selectedText}</span>
                         </div>
                      )}
@@ -248,8 +275,8 @@ export const LinkSelector = ({ editor, open, onOpenChange }: LinkSelectorProps) 
                               type="text"
                               placeholder={
                                  hasSelection
-                                    ? 'URL girin (seçili metin link olacak)'
-                                    : 'URL girin (metin olarak eklenecek)'
+                                    ? i18n.t('LINK_SELECTOR_PLACEHOLDER_SELECTED')
+                                    : i18n.t('LINK_SELECTOR_PLACEHOLDER_UNSELECTED')
                               }
                               className={cn(
                                  'w-full h-7 bg-background border rounded px-3 py-2 text-sm outline-none',
@@ -265,7 +292,7 @@ export const LinkSelector = ({ editor, open, onOpenChange }: LinkSelectorProps) 
                               <div className="mt-1 flex items-center gap-1 text-xs">
                                  {isValidating ? (
                                     <span className="text-muted-foreground">
-                                       Kontrol ediliyor...
+                                       {i18n.t('LINK_SELECTOR_VALIDATING')}
                                     </span>
                                  ) : hasError ? (
                                     <>
@@ -279,7 +306,7 @@ export const LinkSelector = ({ editor, open, onOpenChange }: LinkSelectorProps) 
                            {/* ✅ URL preview (metin seçili değilse) */}
                            {!hasSelection && url && !hasError && (
                               <div className="mt-1 text-xs text-muted-foreground">
-                                 <span>Metin olarak eklenecek: </span>
+                                 <span>{i18n.t('LINK_SELECTOR_PREVIEW_LABEL')}: </span>
                                  <span className="font-medium">{getDisplayText(url)}</span>
                               </div>
                            )}
@@ -292,6 +319,7 @@ export const LinkSelector = ({ editor, open, onOpenChange }: LinkSelectorProps) 
                            disabled={!canSubmit}
                         >
                            <Check className="h-4 w-4" />
+                           <span className="sr-only">{i18n.t('LINK_SELECTOR_SUBMIT')}</span>
                         </Button>
                      </form>
                   </div>
@@ -311,7 +339,9 @@ export const LinkSelector = ({ editor, open, onOpenChange }: LinkSelectorProps) 
                      <div className="border-t pt-3">
                         <div className="flex items-center justify-between">
                            <div className="flex-1 min-w-0">
-                              <p className="text-xs text-muted-foreground mb-1">{'CURRENT_LINK'}</p>
+                              <p className="text-xs text-muted-foreground mb-1">
+                                 {i18n.t('CURRENT_LINK')}
+                              </p>
                               <p className="text-sm truncate text-blue-600">{currentLink}</p>
                            </div>
                            <Button
@@ -351,7 +381,7 @@ export const LinkSelector = ({ editor, open, onOpenChange }: LinkSelectorProps) 
                            className="h-7"
                            disabled={!currentLink}
                         >
-                           {'SAME_TAB'}
+                           {i18n.t('SAME_TAB')}
                         </Button>
                         <Button
                            size="sm"
@@ -375,7 +405,7 @@ export const LinkSelector = ({ editor, open, onOpenChange }: LinkSelectorProps) 
                            className="h-7"
                            disabled={!currentLink}
                         >
-                           {'NEW_TAB'}
+                           {i18n.t('NEW_TAB')}
                         </Button>
                      </div>
                   </div>
